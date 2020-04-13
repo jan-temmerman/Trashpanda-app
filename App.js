@@ -1,37 +1,70 @@
-import React, {useEffect} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import Voice from '@react-native-community/voice';
 
 export default function App() {
+  const [itemsList, setItemsList] = useState([])
+  const [itemsListRendered, setItemsListRendered] = useState()
+  let currentResult
+
+  const renderList = () => {
+    console.log(itemsListRendered)
+    let renderedList = itemsList.map((item, key) =>
+      <Text style={styles.welcome} key={key}>{item}</Text>
+    )
+    setItemsListRendered(renderedList)
+  }  
 
   useEffect(() => {
-    Voice.onSpeechStart = () => console.log('speech started');
-    Voice.onSpeechEnd = () => console.log('speech ended');
-    Voice.onSpeechResults = (e) => checkResults(e.value[0]);
-    
+    console.log(currentResult)
     return
-  }, [])
+  }, [currentResult])
+
+  const isStartStopDetected = (spokenTextLowered) => {
+    let startIndex = spokenTextLowered.indexOf('start')
+    let stopIndex = spokenTextLowered.indexOf('stop')
+
+    if(startIndex < stopIndex && startIndex !== -1 && stopIndex !== -1) {
+      return true
+    } else return false
+  }
 
   const checkResults = (spokenText) => {
-    spokenTextLowered = spokenText.toLowerCase()
+    let spokenTextLowered = spokenText.toLowerCase()
     console.log(spokenTextLowered)
 
-    if(spokenTextLowered.includes('start'))
-      console.log('start detected')
+    if(isStartStopDetected(spokenTextLowered)) {
 
-    if(spokenTextLowered.includes('stop')) {
+
       let unfilteresResult = spokenTextLowered
       let filteredResult = unfilteresResult.substring( unfilteresResult.lastIndexOf("start") + 6, unfilteresResult.lastIndexOf("stop") - 1)
-      console.log('stop detected')
-      console.log('\n result: ' + filteredResult)
+      console.log(filteredResult)
+      currentResult = filteredResult
+
       handleMircophone('stop')
-      handleMircophone('start')
+      setTimeout(() => {
+        handleMircophone('start')
+      }, 1000);
+      
     }
+  }
+
+  const handleEnding = () => {
+    console.log('speech ended')
+    console.log(currentResult)
+    let oldList = itemsList
+    oldList.push(currentResult)
+    setItemsList(oldList)
+    renderList()
   }
 
   const handleMircophone = async(action) => {
 
     if(action === 'start') {
+      Voice.onSpeechStart = () => console.log('speech started');
+      Voice.onSpeechEnd = () => handleEnding();
+      Voice.onSpeechResults = (e) => checkResults(e.value[0]);
+
       try {
           await Voice.start('en-US');
       } catch (e) {
@@ -40,6 +73,7 @@ export default function App() {
     } else if(action === 'stop') {
       try {
         await Voice.stop();
+        Voice.removeAllListeners()
       } catch (e) {
           console.error(e);
       }
@@ -58,6 +92,7 @@ export default function App() {
         onPress={() => handleMircophone('stop')}
         title="stop listening"
       />
+      {itemsListRendered}
     </View>
   );
 }
