@@ -14,10 +14,10 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.trashpanda"
+      "bundleIdentifier": "x.jantemmerman.trashpanda"
     },
     "android": {
-      "package": "com.trashpanda"
+      "package": "x.jantemmerman.trashpanda"
     },
     "entryPoint": "node_modules/expo/AppEntry.js"
   }

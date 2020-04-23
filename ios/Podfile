@@ -45,4 +45,8 @@ target 'Thrashpanda' do
   use_native_modules!
   pod 'react-native-voice', :path => '../node_modules/@react-native-community/voice'
 
+  pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
+
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
 end

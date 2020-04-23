@@ -2,16 +2,8 @@ import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import Voice from '@react-native-community/voice';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
-// Views
-import MyRecordings from './views/MyRecordings';
-import Profile from './views/Profile';
-import MapView from './views/MapView';
-
-export default App = () => {
+export default Profile = () => {
   const [itemsList, setItemsList] = useState([])
   const [itemsListRendered, setItemsListRendered] = useState()
   let currentResult
@@ -89,46 +81,13 @@ export default App = () => {
     }
   }
 
-  const Tab = createBottomTabNavigator();
-
   return (
-    <NavigationContainer>
-       <Tab.Navigator initialRouteName="MyRecordings"
-       screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+    <View style={styles.container}>
+      <Text style={styles.header}>Profile</Text>
+    <View style={styles.background}>
 
-          if (route.name === 'MyRecordings') {
-            iconName = 'ios-list'
-          } else if (route.name === 'MapView') {
-            iconName = 'md-map'
-          } else if (route.name === 'Profile') {
-            iconName = 'md-person'
-          }
-
-          return <Ionicons name={iconName} size={40} color={color}/>;
-        },
-      })}
-      tabBarOptions={{
-        activeTintColor: 'black',
-        inactiveTintColor: 'gray',
-        showLabel: false,
-        size: 30,
-        style: {
-          borderTopLeftRadius: 30,
-          borderTopRightRadius: 30,
-          backgroundColor:"#FFF",
-          position:'absolute',
-          padding:10, 
-        },
-        activeBackgroundColor: 'none'
-      }}>
-        <Tab.Screen name="MapView" component={MapView}/>
-        <Tab.Screen name="MyRecordings" component={MyRecordings}/>
-        <Tab.Screen name="Profile" component={Profile}/>
-      </Tab.Navigator>
-    </NavigationContainer>
+    </View>
+    </View>
   );
 }
 
@@ -136,11 +95,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-start',
+    paddingTop: 47,
     alignItems: 'center',
     backgroundColor: '#FFF',
   },
   header: {
-    alignSelf: 'flex-start'
+    alignSelf: 'flex-start',
+    fontSize: 38,
+    marginLeft: 10,
+    fontFamily: 'Montserrat-Bold'
+  },
+  background: {
+    backgroundColor: '#F7B917',
+    height: '100%',
+    width: '100%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginTop: 6,
   },
   welcome: {
     fontSize: 20,
