@@ -1,9 +1,15 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View, FlatList } from 'react-native';
+import { Button, StyleSheet, Text, View, FlatList, TouchableHighlight } from 'react-native';
 import Voice from '@react-native-community/voice';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export default MyRecordings = () => {
+// Components
+import Layout from '../components/layout'
+import Card from '../components/card'
+import EmptyListPlaceholder from '../components/emptyListPlaceholder';
+
+export default MyRecordings = ({navigation}) => {
   const [itemsList, setItemsList] = useState([])
   const [itemsListRendered, setItemsListRendered] = useState()
   let currentResult
@@ -82,7 +88,7 @@ export default MyRecordings = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <Layout headerTitle="My Recordings" >
       {/*<Text style={styles.welcome}>Welcome to Trashpanda!!!</Text>
       <Button 
         onPress={() => handleMircophone('start')}
@@ -94,20 +100,27 @@ export default MyRecordings = () => {
         title="stop listening"
       />
     {itemsListRendered}*/}
-
-      <Text style={styles.header}>My Recordings</Text>
-      <View style={styles.background}>
       <FlatList
-      style={{width: '100%'}}
-      data={[{title: 'Title Text', key: 'item1'}, {title: 'Title Text 2', key: 'item12'}, {title: 'Title Text 3', key: 'item13'}, {title: 'Title Text 4', key: 'item14'}]}
-      renderItem={({item, index, separators}) => (
-        <View style={styles.card}>
-          <Text>{item.title}</Text>
-        </View>
-      )}
-    />
-      </View>
-    </View>
+        style={{width: '100%', borderTopLeftRadius: 30, borderTopRightRadius: 30,}}
+        contentContainerStyle={{ paddingBottom: 300}}
+        data={[
+          {title: 'card 1', distance: 3, itemsPickedUp: 132, time: '00:43', city: 'Ghent', date: 'Monday 7 februari 2020', id: 'card1'}, 
+          {title: 'card 2', distance: 0.4, itemsPickedUp: 22, time: '00:13', city: 'Ghent', date: 'Friday 21 march 2020', id: 'card2'}, 
+          {title: 'card 3', distance: 5, itemsPickedUp: 214, time: '01:12', city: 'Ghent', date: 'Sunday 2 april 2020', id: 'card3'},
+          {title: 'card 1', distance: 3, itemsPickedUp: 132, time: '00:43', city: 'Ghent', date: 'Monday 7 februari 2020', id: 'card4'}, 
+          {title: 'card 2', distance: 0.4, itemsPickedUp: 22, time: '00:13', city: 'Ghent', date: 'Friday 21 march 2020', id: 'card5'}, 
+          {title: 'card 3', distance: 5, itemsPickedUp: 214, time: '01:12', city: 'Ghent', date: 'Sunday 2 april 2020', id: 'card6'},
+          {title: 'card 1', distance: 3, itemsPickedUp: 132, time: '00:43', city: 'Ghent', date: 'Monday 7 februari 2020', id: 'card7'}, 
+          {title: 'card 2', distance: 0.4, itemsPickedUp: 22, time: '00:13', city: 'Ghent', date: 'Friday 21 march 2020', id: 'card8'}, 
+          {title: 'card 3', distance: 5, itemsPickedUp: 214, time: '01:12', city: 'Ghent', date: 'Sunday 2 april 2020', id: 'card9'},
+        ]}
+        ListEmptyComponent={<EmptyListPlaceholder/>}
+        renderItem={({item, index, separators}) => <Card title={item.title} distance={item.distance} time={item.time} itemsCount={item.itemsPickedUp} date={item.date} city={item.city}/>}
+      />
+      <TouchableHighlight onPress={() => navigation.navigate('AddRecording')} style={styles.addButton}>
+        <Ionicons name={'ios-add'} size={50} color={'#ffb800'}/>
+      </TouchableHighlight>
+    </Layout>
   );
 }
 
@@ -119,30 +132,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFF',
   },
-  card: {
-    backgroundColor: '#FFF',
-    width: '94%',
-    height: 110,
-    marginTop: 14,
-    borderRadius: 24,
-    alignSelf: 'center',
-    padding: 20,
-  },
-  header: {
-    alignSelf: 'flex-start',
-    fontSize: 38,
-    marginLeft: 10,
-    fontFamily: 'Montserrat-Bold'
-  },
-  background: {
-    backgroundColor: '#F7B917',
-    alignItems: 'center',
-    height: '100%',
-    width: '100%',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    marginTop: 6,
-  },
   welcome: {
     fontSize: 20,
     textAlign: 'center',
@@ -153,4 +142,17 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  addButton: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    bottom: 144,
+    right: 8,
+    backgroundColor: 'black',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    zIndex: 10,
+    paddingTop: 4,
+  }
 });

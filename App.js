@@ -4,90 +4,27 @@ import { Button, StyleSheet, Text, View } from 'react-native';
 import Voice from '@react-native-community/voice';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Views
 import MyRecordings from './views/MyRecordings';
 import Profile from './views/Profile';
 import MapView from './views/MapView';
+import AddRecording from './views/AddRecording';
+
+const RecordingsStack = createStackNavigator();
+
+function RecordingsStackScreen() {
+  return (
+    <RecordingsStack.Navigator screenOptions={{headerShown: false}}>
+      <RecordingsStack.Screen name="MyRecordings" component={MyRecordings} />
+      <RecordingsStack.Screen name="AddRecording" component={AddRecording} />
+    </RecordingsStack.Navigator>
+  );
+}
 
 export default App = () => {
-  const [itemsList, setItemsList] = useState([])
-  const [itemsListRendered, setItemsListRendered] = useState()
-  let currentResult
-
-  const renderList = () => {
-    console.log(itemsListRendered)
-    let renderedList = itemsList.map((item, key) =>
-      <Text style={styles.welcome} key={key}>{item}</Text>
-    )
-    setItemsListRendered(renderedList)
-  }  
-
-  useEffect(() => {
-    console.log(currentResult)
-    return
-  }, [currentResult])
-
-  const isStartStopDetected = (spokenTextLowered) => {
-    let startIndex = spokenTextLowered.indexOf('start')
-    let stopIndex = spokenTextLowered.indexOf('stop')
-
-    if(startIndex < stopIndex && startIndex !== -1 && stopIndex !== -1) {
-      return true
-    } else return false
-  }
-
-  const checkResults = (spokenText) => {
-    let spokenTextLowered = spokenText.toLowerCase()
-    console.log(spokenTextLowered)
-
-    if(isStartStopDetected(spokenTextLowered)) {
-
-
-      let unfilteresResult = spokenTextLowered
-      let filteredResult = unfilteresResult.substring( unfilteresResult.lastIndexOf("start") + 6, unfilteresResult.lastIndexOf("stop") - 1)
-      console.log(filteredResult)
-      currentResult = filteredResult
-
-      handleMircophone('stop')
-      setTimeout(() => {
-        handleMircophone('start')
-      }, 1000);
-      
-    }
-  }
-
-  const handleEnding = () => {
-    console.log('speech ended')
-    console.log(currentResult)
-    let oldList = itemsList
-    oldList.push(currentResult)
-    setItemsList(oldList)
-    renderList()
-  }
-
-  const handleMircophone = async(action) => {
-
-    if(action === 'start') {
-      Voice.onSpeechStart = () => console.log('speech started');
-      Voice.onSpeechEnd = () => handleEnding();
-      Voice.onSpeechResults = (e) => checkResults(e.value[0]);
-
-      try {
-          await Voice.start('en-US');
-      } catch (e) {
-          console.error(e);
-      }
-    } else if(action === 'stop') {
-      try {
-        await Voice.stop();
-        Voice.removeAllListeners()
-      } catch (e) {
-          console.error(e);
-      }
-    }
-  }
 
   const Tab = createBottomTabNavigator();
 
@@ -107,12 +44,13 @@ export default App = () => {
             iconName = 'md-person'
           }
 
-          return <Ionicons name={iconName} size={40} color={color}/>;
+          return <Ionicons name={iconName} size={34} color={color}/>;
         },
       })}
       tabBarOptions={{
         activeTintColor: 'black',
-        inactiveTintColor: 'gray',
+        activeBackgroundColor: '#EFEFEF',
+        inactiveTintColor: 'black',
         showLabel: false,
         size: 30,
         style: {
@@ -120,12 +58,22 @@ export default App = () => {
           borderTopRightRadius: 30,
           backgroundColor:"#FFF",
           position:'absolute',
-          padding:10, 
+          padding: 2,
+          paddingLeft: 18,
+          paddingRight: 18,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.29,
+          shadowRadius: 4.65,
+          elevation: 7,
         },
-        activeBackgroundColor: 'none'
+        tabStyle: {
+          borderRadius: 8,
+          margin: 2,
+        }
       }}>
         <Tab.Screen name="MapView" component={MapView}/>
-        <Tab.Screen name="MyRecordings" component={MyRecordings}/>
+        <Tab.Screen name="MyRecordings" component={RecordingsStackScreen}/>
         <Tab.Screen name="Profile" component={Profile}/>
       </Tab.Navigator>
     </NavigationContainer>

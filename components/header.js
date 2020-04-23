@@ -1,40 +1,24 @@
 import 'react-native-gesture-handler';
-import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
-export default Header = () => {
+export default Header = (props) => {
 
   return (
     <View style={styles.container}>
-        <Text style={styles.header}>My Recordings</Text>
+        <Text style={styles.header}>{props.title}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    alignSelf: 'flex-start'
+    width: '100%'
   },
   header: {
     alignSelf: 'flex-start',
-    color: '#000',
-    fontSize: 34,
-    fontWeight: '700'
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+    fontSize: 38,
+    marginLeft: 10,
+    fontFamily: 'Montserrat-Bold'
   },
 });

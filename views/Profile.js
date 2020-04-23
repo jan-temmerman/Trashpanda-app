@@ -83,10 +83,9 @@ export default Profile = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Profile</Text>
-    <View style={styles.background}>
-
-    </View>
+      <Header title="My Recordings"/>
+      <View style={styles.background}>
+      </View>
     </View>
   );
 }
