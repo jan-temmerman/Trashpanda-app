@@ -132,21 +132,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
   addButton: {
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    bottom: 144,
+    bottom: 110,
     right: 8,
     backgroundColor: 'black',
     width: 70,

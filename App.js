@@ -12,40 +12,39 @@ import MyRecordings from './views/MyRecordings';
 import Profile from './views/Profile';
 import MapView from './views/MapView';
 import AddRecording from './views/AddRecording';
+import NewRecording from './views/NewRecording';
 
-const RecordingsStack = createStackNavigator();
+function OnboardStack() {
+  const OnboardStack = createStackNavigator();
 
-function RecordingsStackScreen() {
   return (
-    <RecordingsStack.Navigator screenOptions={{headerShown: false}}>
-      <RecordingsStack.Screen name="MyRecordings" component={MyRecordings} />
-      <RecordingsStack.Screen name="AddRecording" component={AddRecording} />
-    </RecordingsStack.Navigator>
+    <OnboardStack.Navigator screenOptions={{headerShown: false}}>
+      <OnboardStack.Screen name="MyRecordings" component={MyRecordings} />
+      <OnboardStack.Screen name="AddRecording" component={AddRecording} />
+    </OnboardStack.Navigator>
   );
 }
 
-export default App = () => {
-
+function HomeTabs() {
   const Tab = createBottomTabNavigator();
 
   return (
-    <NavigationContainer>
-       <Tab.Navigator initialRouteName="MyRecordings"
-       screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+    <Tab.Navigator initialRouteName="MyRecordings"
+      screenOptions={({ route }) => ({
+      headerShown: false,
+      tabBarIcon: ({ focused, color, size }) => {
+        let iconName;
 
-          if (route.name === 'MyRecordings') {
-            iconName = 'ios-list'
-          } else if (route.name === 'MapView') {
-            iconName = 'md-map'
-          } else if (route.name === 'Profile') {
-            iconName = 'md-person'
-          }
+        if (route.name === 'MyRecordings') {
+          iconName = 'ios-list'
+        } else if (route.name === 'MapView') {
+          iconName = 'md-map'
+        } else if (route.name === 'Profile') {
+          iconName = 'md-person'
+        }
 
-          return <Ionicons name={iconName} size={34} color={color}/>;
-        },
+        return <Ionicons name={iconName} size={34} color={color}/>;
+      },
       })}
       tabBarOptions={{
         activeTintColor: 'black',
@@ -71,11 +70,25 @@ export default App = () => {
           borderRadius: 8,
           margin: 2,
         }
-      }}>
-        <Tab.Screen name="MapView" component={MapView}/>
-        <Tab.Screen name="MyRecordings" component={RecordingsStackScreen}/>
-        <Tab.Screen name="Profile" component={Profile}/>
-      </Tab.Navigator>
+    }}>
+      <Tab.Screen name="MapView" component={MapView}/>
+      <Tab.Screen name="MyRecordings" component={OnboardStack}/>
+      <Tab.Screen name="Profile" component={Profile}/>
+    </Tab.Navigator>
+  );
+}
+
+export default App = () => {
+
+  const RecordingsStack = createStackNavigator();
+
+  return (
+    <NavigationContainer>
+      <RecordingsStack.Navigator screenOptions={{headerShown: false}}>
+        <RecordingsStack.Screen name="HomeTabs" component={HomeTabs} />
+        <RecordingsStack.Screen name="AddRecording" component={AddRecording} />
+        <RecordingsStack.Screen options={{ gestureEnabled: true }} name="NewRecording" component={NewRecording} />
+      </RecordingsStack.Navigator>
     </NavigationContainer>
   );
 }

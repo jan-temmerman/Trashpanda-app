@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { Children } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
 
 // Components
 import Header from '../components/header'
@@ -8,12 +8,12 @@ import Header from '../components/header'
 export default Layout = (props) => {
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header title={props.headerTitle} navigationObject={props.navigationObject} backButtonVisible={props.backButtonVisible}/>
       <View style={styles.background}>
         {props.children}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-start',
-    paddingTop: 47,
     alignItems: 'center',
     backgroundColor: '#FFF',
   },

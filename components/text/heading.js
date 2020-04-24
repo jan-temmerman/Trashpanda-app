@@ -13,7 +13,7 @@ export default Heading = (props) => {
         textAlign: props.textAlign,
         fontSize: 18,
         marginBottom: 14,
-        fontFamily: 'Montserrat-Bold'
+        fontFamily: 'Montserrat-Bold',
       }}>{props.text}</Text>
     </View>
   );
