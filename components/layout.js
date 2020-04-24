@@ -9,7 +9,7 @@ export default Layout = (props) => {
 
   return (
     <View style={styles.container}>
-      <Header title={props.headerTitle}/>
+      <Header title={props.headerTitle} navigationObject={props.navigationObject} backButtonVisible={props.backButtonVisible}/>
       <View style={styles.background}>
         {props.children}
       </View>
