@@ -4,6 +4,7 @@ import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView
 import Carousel from 'react-native-carousel-view';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dash from 'react-native-dash';
 
 // Components
@@ -13,6 +14,18 @@ import Paragraph from '../components/text/paragraph';
 
 export default AddRecording = ({navigation}) => {
   const [textInput, setTextInput] = useState("")
+  const [micOn, setMicOn] = useState(true)
+  const [micIcon, setMicIcon] = useState(<MaterialCommunityIcons name={'microphone-off'} size={30} color={'black'} style={{paddingTop: 1}}/>)
+
+  const toggleMic = () => {
+    if(micOn) {
+      setMicIcon(<MaterialCommunityIcons name={'microphone'} size={30} color={'black'} style={{paddingTop: 1}}/>)
+      setMicOn(false)
+    } else if(!micOn) {
+      setMicIcon(<MaterialCommunityIcons name={'microphone-off'} size={30} color={'black'} style={{paddingTop: 1}}/>)
+      setMicOn(true)
+    }
+  }
   
   return (
     <Layout headerTitle="New Recording" navigationObject={navigation} >
@@ -26,9 +39,12 @@ export default AddRecording = ({navigation}) => {
           }}>What do you want to add?</Text>
 
         <View style={styles.textBoxContainer}>
+          <TouchableOpacity onPress={() => toggleMic()}>
+            {micIcon}
+          </TouchableOpacity>
           <TextInput
             clearButtonMode={"while-editing"}
-            style={{ height: '100%'}}
+            style={{ height: '100%', flex: 1, marginLeft: 4}}
             onChangeText={text => setTextInput(text)}
             value={textInput}
           />
@@ -56,7 +72,7 @@ export default AddRecording = ({navigation}) => {
               marginBottom: 10,
               fontFamily: 'Montserrat-Bold',
             }}>Current list</Text>
-            <Dash style={{width:'100%', height: 1}} dashGap={2} dashLength={12} dashColor={"#707070"} />
+            <Dash style={{width:'100%', height: 1,}} dashGap={2} dashLength={12} dashColor={"#707070"} />
 
             <View style={styles.itemContainer}>
 
@@ -64,7 +80,7 @@ export default AddRecording = ({navigation}) => {
                 <TouchableOpacity style={styles.minusButton}>
                   <AntDesign name={'minus'} size={34} color={'white'}/>
                 </TouchableOpacity>
-                <Text style={styles.amountText}>444</Text>
+                <Text style={styles.amountText}>12</Text>
                 <TouchableOpacity style={styles.plusButton}>
                   <AntDesign name={'plus'} size={28} color={'black'}/>
                 </TouchableOpacity>
@@ -84,7 +100,7 @@ export default AddRecording = ({navigation}) => {
                 <TouchableOpacity style={styles.minusButton}>
                   <AntDesign name={'minus'} size={34} color={'white'}/>
                 </TouchableOpacity>
-                <Text style={styles.amountText}>4</Text>
+                <Text style={styles.amountText}>9</Text>
                 <TouchableOpacity style={styles.plusButton}>
                   <AntDesign name={'plus'} size={28} color={'black'}/>
                 </TouchableOpacity>
@@ -132,7 +148,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 4,
     paddingLeft: 10,
-    marginBottom: 4
+    marginBottom: 4,
+    flexDirection: 'row'
   },
   listContainer: {
     width: '100%',
@@ -140,7 +157,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 30,
     marginTop: 20,
-    padding: 20,
+    padding: 16,
     paddingTop: 14
   },
   minusButton: {
@@ -188,9 +205,10 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
+    paddingTop: 8,
+    paddingBottom: 8,
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   amountContainer: {
     flexDirection: 'row', 

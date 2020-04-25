@@ -2,19 +2,19 @@ import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import Voice from '@react-native-community/voice';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 
 // Components
-import Header from '../components/header'
+import Layout from '../components/layout';
 
 export default MapView = () => {
 
-  return (
-    <View style={styles.container}>
-      <Header title="Map"/>
-      <View style={styles.background}>
+  MapboxGL.setAccessToken('pk.eyJ1IjoiamFudGVtbWUiLCJhIjoiY2s5ZjBhM3Y5MDZwMDNubzdvb3E2Z2ZjNCJ9.zQuSQryovj4h_w6Eg6cmyg');
 
-      </View>
-    </View>
+  return (
+    <Layout headerTitle={"Map"}>
+
+    </Layout>
   );
 }
 
