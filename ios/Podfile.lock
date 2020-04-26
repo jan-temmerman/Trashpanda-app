@@ -228,6 +228,8 @@ PODS:
     - React
   - react-native-camera/RN (3.23.1):
     - React
+  - react-native-geolocation (2.0.2):
+    - React
   - react-native-mapbox-gl (8.0.0):
     - "@react-native-mapbox-gl-mapbox-static (~> 5.7)"
     - Mapbox-iOS-SDK (~> 5.7)
@@ -366,6 +368,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-camera (from `../node_modules/react-native-camera`)
+  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - "react-native-mapbox-gl (from `../node_modules/@react-native-mapbox-gl/maps`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-voice (from `../node_modules/@react-native-community/voice`)"
@@ -463,6 +466,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-camera:
     :path: "../node_modules/react-native-camera"
+  react-native-geolocation:
+    :path: "../node_modules/@react-native-community/geolocation"
   react-native-mapbox-gl:
     :path: "../node_modules/@react-native-mapbox-gl/maps"
   react-native-safe-area-context:
@@ -562,6 +567,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 1540d1c01bb493ae3124ed83351b1b6a155db7da
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
   react-native-camera: 6fe72fd0a85732e2449928f9c59a2e0bf661ad3b
+  react-native-geolocation: cbd9d6bd06bac411eed2671810f454d4908484a8
   react-native-mapbox-gl: 77b87a1dd2d7b41b6b77018c0f3bed5f8ee55c81
   react-native-safe-area-context: 8260e5157617df4b72865f44006797f895b2ada7
   react-native-voice: f984ded3caa25a97472f2d99faf640ede9a37a98

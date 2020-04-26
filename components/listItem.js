@@ -13,7 +13,7 @@ export default ListItem = (props) => {
 
   if(props.imageUri != "") {
     imageButton = 
-      <TouchableOpacity onPress={() => props.navigation.navigate('CameraView', { itemIndex: props.index })} style={styles.cameraButton2}>
+      <TouchableOpacity onPress={() => props.showPreview(props.index, props.imageUri)} style={styles.cameraButton2}>
         <Image style={{width: '100%', height: '100%', borderRadius: 10}} source={{uri: props.imageUri}}/>
       </TouchableOpacity>
   }

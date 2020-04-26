@@ -1,8 +1,10 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Octicons from 'react-native-vector-icons/Octicons';
 import Dash from 'react-native-dash';
+import Geolocation from '@react-native-community/geolocation';
 
 // Components
 import Layout from '../components/layout';
@@ -16,35 +18,19 @@ export default AddRecording = ({route, navigation}) => {
   const [textInput, setTextInput] = useState("")
   const [micOn, setMicOn] = useState(true)
   const [micIcon, setMicIcon] = useState(<MaterialCommunityIcons name={'microphone-off'} size={26} color={'black'} style={{paddingTop: 3}}/>)
-  const [items, setItems] = useState([
-    {
-      name: 'Coca-cola can',
-      amount: 13,
-      imageUri: "",
-    },
-    {
-      name: 'Jupiler can',
-      amount: 92,
-      imageUri: "",
-    },
-    {
-      name: 'Cigarette',
-      amount: 21,
-      imageUri: "",
-    },
-    {
-      name: 'Plastic bag',
-      amount: 2,
-      imageUri: "",
-    },
-  ])
+  const [previewModal, setPreviewModal] = useState(null)
+  const [items, setItems] = useState([])
   
   useEffect(() => {
-    console.log(itemIndex + ', ' + imageUri)
-    if(itemIndex != null)
+    if(itemIndex != null && imageUri !== "")
       setImageUri(itemIndex, imageUri)
     return
-  }, [itemIndex])
+  }, [itemIndex, imageUri])
+
+  useEffect(() => {
+    console.log(items[0])
+    return
+  }, [items])
 
   const toggleMic = () => {
     if(micOn) {
@@ -56,10 +42,14 @@ export default AddRecording = ({route, navigation}) => {
     }
   }
 
-  const updateAmount = (index, action) => {
+  const updateAmount = async(index, action) => {
+    let coordinates = {}
+    coordinates = await getCoordinates()
     if(action === 'increment'){
       let oldItems = [...items]
       oldItems[index].amount = oldItems[index].amount + 1
+      console.log(coordinates)
+      oldItems[index].geolocations.push(coordinates)
       let updatedItems = oldItems
       
       setItems(updatedItems)
@@ -67,6 +57,7 @@ export default AddRecording = ({route, navigation}) => {
       let oldItems = [...items]
       if(oldItems[index].amount > 0) {
         oldItems[index].amount = oldItems[index].amount - 1
+        oldItems[index].geolocations.pop()
         let updatedItems = oldItems
         
         setItems(updatedItems)
@@ -84,27 +75,48 @@ export default AddRecording = ({route, navigation}) => {
   }
 
   const setImageUri = (index, imageUri) => {
+    console.log('setImageUri called')
     let oldItems = [...items]
     oldItems[index].imageUri = imageUri
     let updatedItems = oldItems
     setItems(updatedItems)
-    console.log(items)
   }
 
-  const handleTextInput = (text) => {
+  const getCoordinates = () => {
+    let coordinates
+
+    return new Promise(resolve => {
+      Geolocation.getCurrentPosition(info => {
+        coordinates = {
+          latitude: info.coords.latitude,
+          longitude: info.coords.longitude
+        }
+  
+        resolve(coordinates)
+      })
+    })
+  }
+
+  const handleTextInput = async(text) => {
     let updatedItems = [...items]
+    let coordinates = {}
+
+    coordinates = await getCoordinates()
     
     if(!isAlreadyInList(text)) {
       updatedItems.push({
         name: text,
-        amount: 0
+        amount: 1,
+        imageUri: "",
+        geolocations: [coordinates]
       })
-      
+
       setItems(updatedItems) 
     } else {
       for([index, value] of items.entries()) {
         if(value.name.toLowerCase() === text.toLowerCase()) {
           updatedItems[index].amount = updatedItems[index].amount + 1
+          updatedItems[index].geolocations.push(coordinates)
         }
       }
       setItems(updatedItems) 
@@ -133,9 +145,49 @@ export default AddRecording = ({route, navigation}) => {
     updatedItems.splice(index, 1)
     setItems(updatedItems)
   }
+
+  const askForImageDeletion = (index) => {
+    Alert.alert(
+      "Delete image?",
+      `Do you want to delete this image?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        { text: "Yes", onPress: () => deleteImage(index) }
+      ],
+      { cancelable: false }
+    );
+  }
+
+  const deleteImage = (index) => {
+    let updatedItems = [...items]
+    updatedItems[index].imageUri = ""
+    setItems(updatedItems)
+    setPreviewModal(null)
+  }
+
+  const showPreview = (index, imageUri) => {
+    if(imageUri != "")
+      setPreviewModal(
+        <View style={{position: 'absolute', flex: 1, width: '100%', height: '100%', zIndex: 20, borderRadius: 30, overflow: 'hidden', justifyContent: 'flex-end'}}>
+          <Image style={{width: '100%', height: '100%', }} source={{uri: imageUri}}/>
+          <TouchableOpacity onPress={() => setPreviewModal(null)} style={{zIndex: 21, position: 'absolute', top: 10, left: 20}}>
+            <Octicons name={'x'} size={38} color={'#FFF'}/>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => askForImageDeletion(index)} style={styles.deleteImageButton}>
+            <Text style={styles.deleteImageButtonText}>Delete image</Text>
+          </TouchableOpacity>
+        </View>
+      )
+    else
+      setPreviewModal(null)
+  }
   
   return (
     <Layout headerTitle="New Recording" navigationObject={navigation} >
+      {previewModal}
       <ScrollView style={{width: '100%', height: '100%', paddingTop: 16, padding: 10, marginBottom: -100, borderRadius: 30}}>
           <Text style={{
             alignSelf: 'flex-start',
@@ -185,6 +237,7 @@ export default AddRecording = ({route, navigation}) => {
                   <ListItem 
                     key={index}
                     imageUri={item.imageUri}
+                    showPreview={(index, imageUri) => showPreview(index, imageUri)}
                     askForDeletion={(itemAmount, itemName, index) => askForDeletion(itemAmount, itemName, index)}
                     navigation={navigation}
                     index={index}
@@ -227,4 +280,22 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
   },
+  deleteImageButton: {
+    height: 60,
+    backgroundColor: '#d82b2b',
+    borderRadius: 40,
+    padding: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    bottom: 80,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute'
+  },
+  deleteImageButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontFamily: 'Montserrat-ExtraBold',
+  }
 });
