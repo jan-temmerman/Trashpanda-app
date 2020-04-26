@@ -1,10 +1,13 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Image,  } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
+import Feather from 'react-native-vector-icons/Feather';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Dash from 'react-native-dash';
 import Geolocation from '@react-native-community/geolocation';
+import Voice from '@react-native-community/voice';
 
 // Components
 import Layout from '../components/layout';
@@ -20,6 +23,7 @@ export default AddRecording = ({route, navigation}) => {
   const [micIcon, setMicIcon] = useState(<MaterialCommunityIcons name={'microphone-off'} size={26} color={'black'} style={{paddingTop: 3}}/>)
   const [previewModal, setPreviewModal] = useState(null)
   const [items, setItems] = useState([])
+  let currentResult
   
   useEffect(() => {
     if(itemIndex != null && imageUri !== "")
@@ -28,15 +32,78 @@ export default AddRecording = ({route, navigation}) => {
   }, [itemIndex, imageUri])
 
   useEffect(() => {
-    console.log(items[0])
+    if(micIcon)
+      handleMircophone('start')
+    else
+      handleMircophone('stop')
     return
-  }, [items])
+  }, [])
+
+  const isStartStopDetected = (spokenTextLowered) => {
+    let startIndex = spokenTextLowered.indexOf('start')
+    let stopIndex = spokenTextLowered.indexOf('stop')
+
+    if(startIndex < stopIndex && startIndex !== -1 && stopIndex !== -1) {
+      return true
+    } else return false
+  }
+
+  const checkResults = (spokenText) => {
+    let spokenTextLowered = spokenText.toLowerCase()
+    console.log(spokenTextLowered)
+
+    if(isStartStopDetected(spokenTextLowered)) {
+
+
+      let unfilteresResult = spokenTextLowered
+      let filteredResult = unfilteresResult.substring( unfilteresResult.lastIndexOf("start") + 6, unfilteresResult.indexOf("stop") - 1)
+      console.log(filteredResult)
+      currentResult = filteredResult
+
+      handleTextInput(currentResult)
+
+      handleMircophone('stop')
+      setTimeout(() => {
+        handleMircophone('start')
+      }, 1000);
+      
+    }
+  }
+
+  const handleEnding = () => {
+    console.log('speech ended')
+  }
+
+  const handleMircophone = async(action) => {
+
+    if(action === 'start') {
+      Voice.onSpeechStart = () => console.log('speech started');
+      Voice.onSpeechEnd = () => handleEnding();
+      Voice.onSpeechResults = (e) => checkResults(e.value[0]);
+
+      try {
+          await Voice.start('en-US');
+      } catch (e) {
+          console.error(e);
+      }
+    } else if(action === 'stop') {
+      try {
+        await Voice.stop();
+        Voice.removeAllListeners()
+      } catch (e) {
+          console.error(e);
+      }
+    }
+  }
+
 
   const toggleMic = () => {
     if(micOn) {
+      handleMircophone('stop')
       setMicIcon(<MaterialCommunityIcons name={'microphone'} size={26} color={'black'} style={{paddingTop: 3}}/>)
       setMicOn(false)
     } else if(!micOn) {
+      handleMircophone('start')
       setMicIcon(<MaterialCommunityIcons name={'microphone-off'} size={26} color={'black'} style={{paddingTop: 3}}/>)
       setMicOn(true)
     }
@@ -66,8 +133,10 @@ export default AddRecording = ({route, navigation}) => {
   }
 
   const isAlreadyInList = (text) => {
+    console.log(items)
     for(item of items) {
       if(item.name.toLowerCase() === text.toLowerCase()) {
+        console.log(item.name.toLowerCase() + ', ' + text.toLowerCase())
         return true
       }
     }
@@ -97,29 +166,35 @@ export default AddRecording = ({route, navigation}) => {
     })
   }
 
+  function isEmptyOrSpaces(str){
+    return str === null || str.match(/^ *$/) !== null;
+  }
+
   const handleTextInput = async(text) => {
     let updatedItems = [...items]
+    console.log(updatedItems)
     let coordinates = {}
 
-    coordinates = await getCoordinates()
-    
-    if(!isAlreadyInList(text)) {
-      updatedItems.push({
-        name: text,
-        amount: 1,
-        imageUri: "",
-        geolocations: [coordinates]
-      })
+    if(!isEmptyOrSpaces(text)) {
+      coordinates = await getCoordinates()
+      console.log(isAlreadyInList(text))
+      if(!isAlreadyInList(text)) {
+        let newItem = {
+          name: text,
+          amount: 1,
+          imageUri: "",
+          geolocations: [coordinates]
+        }
 
-      setItems(updatedItems) 
-    } else {
-      for([index, value] of items.entries()) {
-        if(value.name.toLowerCase() === text.toLowerCase()) {
-          updatedItems[index].amount = updatedItems[index].amount + 1
-          updatedItems[index].geolocations.push(coordinates)
+        setItems(prevState => [...prevState, newItem]) 
+      } else {
+        for([index, value] of items.entries()) {
+          if(value.name.toLowerCase() === text.toLowerCase()) {
+            updatedItems[index].amount = updatedItems[index].amount + 1
+            updatedItems[index].geolocations.push(coordinates)
+          }
         }
       }
-      setItems(updatedItems) 
     }
 
     setTextInput("")
@@ -185,10 +260,33 @@ export default AddRecording = ({route, navigation}) => {
       setPreviewModal(null)
   }
   
+
+  let itemsList
+
+  if(items.length) {
+    itemsList = items.map((item, index) => {
+      return (
+        <ListItem 
+          key={index}
+          imageUri={item.imageUri}
+          showPreview={(index, imageUri) => showPreview(index, imageUri)}
+          askForDeletion={(itemAmount, itemName, index) => askForDeletion(itemAmount, itemName, index)}
+          navigation={navigation}
+          index={index}
+          itemAmount={item.amount}
+          itemName={item.name}
+          updateAmount={(index, action) => updateAmount(index, action)}
+        />
+      )
+    })
+  } else {
+    itemsList = <Text style={styles.itemsListEmptyText}>No items added yet.</Text>
+  }
+
   return (
     <Layout headerTitle="New Recording" navigationObject={navigation} >
       {previewModal}
-      <ScrollView style={{width: '100%', height: '100%', paddingTop: 16, padding: 10, marginBottom: -100, borderRadius: 30}}>
+      <ScrollView style={{width: '100%', height: '100%', paddingTop: 16, padding: 10, marginBottom: -100, borderRadius: 30}} contentContainerStyle={{ paddingBottom: 0}}>
           <Text style={{
             alignSelf: 'flex-start',
             textAlign: 'left',
@@ -203,7 +301,7 @@ export default AddRecording = ({route, navigation}) => {
           </TouchableOpacity>
           <TextInput
             placeholder={'E.g. Plastic bag'}
-            onSubmitEditing={(event) => handleTextInput(event.nativeEvent.text)}
+            onSubmitEditing={() => handleTextInput(textInput)}
             returnKeyType={'done'}
             clearButtonMode={"while-editing"}
             placeholderTextColor={'lightgray'}
@@ -212,6 +310,9 @@ export default AddRecording = ({route, navigation}) => {
             onChangeText={text => setTextInput(text)}
             value={textInput}
           />
+          <TouchableOpacity onPress={() => handleTextInput(textInput)}>
+            <Feather name={'arrow-right-circle'} size={30} color={'black'} style={{paddingTop: 0}}/>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.suggestionContainer}>
@@ -231,27 +332,14 @@ export default AddRecording = ({route, navigation}) => {
 
             <Dash style={{width:'100%', height: 1,}} dashGap={2} dashLength={12} dashColor={"#707070"} />
             
-            {
-              items.map((item, index) => {
-                return (
-                  <ListItem 
-                    key={index}
-                    imageUri={item.imageUri}
-                    showPreview={(index, imageUri) => showPreview(index, imageUri)}
-                    askForDeletion={(itemAmount, itemName, index) => askForDeletion(itemAmount, itemName, index)}
-                    navigation={navigation}
-                    index={index}
-                    itemAmount={item.amount}
-                    itemName={item.name}
-                    updateAmount={(index, action) => updateAmount(index, action)}
-                  />
-                )
-              })
-            }
+            {itemsList}
 
         </View>
 
       </ScrollView>
+      <TouchableOpacity onPress={() => console.log('ended')} style={styles.finishButton}>
+        <FontAwesome5 name={'flag-checkered'} size={30} color={'white'}/>
+      </TouchableOpacity>
     </Layout>
   );
 }
@@ -274,7 +362,8 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     marginTop: 20,
     padding: 16,
-    paddingTop: 14
+    paddingTop: 14,
+    paddingBottom: 300,
   },
   suggestionContainer: {
     width: '100%',
@@ -297,5 +386,25 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontFamily: 'Montserrat-ExtraBold',
+  },
+  itemsListEmptyText: {
+    color: 'black',
+    fontSize: 16,
+    fontFamily: 'Montserrat-Regular',
+    alignSelf: 'center',
+    marginTop: 10,
+  },
+  finishButton: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    bottom: 60,
+    right: 20,
+    backgroundColor: 'black',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    zIndex: 10,
+    paddingTop: 4,
   }
 });
