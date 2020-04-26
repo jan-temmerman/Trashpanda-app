@@ -14,6 +14,7 @@ import MapView from './views/MapView';
 import AddRecording from './views/AddRecording';
 import NewRecording from './views/NewRecording';
 import CameraView from './views/CameraView';
+import SummaryView from './views/SummaryView';
 
 function OnboardStack() {
   const OnboardStack = createStackNavigator();
@@ -89,6 +90,7 @@ export default App = () => {
         <RecordingsStack.Screen name="HomeTabs" component={HomeTabs} />
         <RecordingsStack.Screen name="AddRecording" component={AddRecording} />
         <RecordingsStack.Screen options={{ gestureEnabled: true }} name="NewRecording" component={NewRecording} initialParams={{itemIndex: null, imageUri: null}}/>
+        <RecordingsStack.Screen options={{ gestureEnabled: true }} name="SummaryView" component={SummaryView} initialParams={{data: null}}/>
         <RecordingsStack.Screen options={{ gestureEnabled: true }} name="CameraView" component={CameraView} />
       </RecordingsStack.Navigator>
     </NavigationContainer>

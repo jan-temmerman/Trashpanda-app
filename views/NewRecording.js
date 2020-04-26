@@ -8,13 +8,14 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Dash from 'react-native-dash';
 import Geolocation from '@react-native-community/geolocation';
 import Voice from '@react-native-community/voice';
+import database from '@react-native-firebase/database';
 
 // Components
 import Layout from '../components/layout';
 import ListItem from '../components/listItem';
 import Suggestion from '../components/suggestion'
 
-export default AddRecording = ({route, navigation}) => {
+export default NewRecording = ({route, navigation}) => {
   const { itemIndex } = route.params; 
   const { imageUri } = route.params; 
 
@@ -24,6 +25,7 @@ export default AddRecording = ({route, navigation}) => {
   const [previewModal, setPreviewModal] = useState(null)
   const [items, setItems] = useState([])
   let currentResult
+  const [startTime, setStartTime] = useState(new Date().getTime())
   
   useEffect(() => {
     if(itemIndex != null && imageUri !== "")
@@ -35,9 +37,10 @@ export default AddRecording = ({route, navigation}) => {
     if(micIcon)
       handleMircophone('start')
     else
-      handleMircophone('stop')
+      handleMircophone('start')
+    console.log(currentResult)
     return
-  }, [])
+  }, [currentResult])
 
   const isStartStopDetected = (spokenTextLowered) => {
     let startIndex = spokenTextLowered.indexOf('start')
@@ -48,19 +51,27 @@ export default AddRecording = ({route, navigation}) => {
     } else return false
   }
 
+  const isSubmitDetected = (spokenTextLowered) => {
+    if(spokenTextLowered.indexOf('enter') !== -1) {
+      handleTextInput(textInput)
+    } else return
+  }
+
   const checkResults = (spokenText) => {
     let spokenTextLowered = spokenText.toLowerCase()
     console.log(spokenTextLowered)
 
+    isSubmitDetected(spokenTextLowered)
+
     if(isStartStopDetected(spokenTextLowered)) {
 
-
       let unfilteresResult = spokenTextLowered
-      let filteredResult = unfilteresResult.substring( unfilteresResult.lastIndexOf("start") + 6, unfilteresResult.indexOf("stop") - 1)
+      let filteredResult = unfilteresResult.substring( unfilteresResult.lastIndexOf("start") + 6, unfilteresResult.lastIndexOf("stop") - 1)
       console.log(filteredResult)
       currentResult = filteredResult
 
-      handleTextInput(currentResult)
+      setTextInput(filteredResult)
+      //handleTextInput(currentResult)
 
       handleMircophone('stop')
       setTimeout(() => {
@@ -72,6 +83,7 @@ export default AddRecording = ({route, navigation}) => {
 
   const handleEnding = () => {
     console.log('speech ended')
+    console.log(currentResult)
   }
 
   const handleMircophone = async(action) => {
@@ -133,10 +145,8 @@ export default AddRecording = ({route, navigation}) => {
   }
 
   const isAlreadyInList = (text) => {
-    console.log(items)
     for(item of items) {
       if(item.name.toLowerCase() === text.toLowerCase()) {
-        console.log(item.name.toLowerCase() + ', ' + text.toLowerCase())
         return true
       }
     }
@@ -170,30 +180,29 @@ export default AddRecording = ({route, navigation}) => {
     return str === null || str.match(/^ *$/) !== null;
   }
 
-  const handleTextInput = async(text) => {
+  const handleTextInput = async() => {
+    console.log(textInput)
     let updatedItems = [...items]
-    console.log(updatedItems)
     let coordinates = {}
 
-    if(!isEmptyOrSpaces(text)) {
+    if(!isEmptyOrSpaces(textInput)) {
       coordinates = await getCoordinates()
-      console.log(isAlreadyInList(text))
-      if(!isAlreadyInList(text)) {
-        let newItem = {
-          name: text,
+      
+      if(!isAlreadyInList(textInput)) {
+        setItems(prevState => [...prevState, {
+          name: textInput,
           amount: 1,
           imageUri: "",
           geolocations: [coordinates]
-        }
-
-        setItems(prevState => [...prevState, newItem]) 
+        }])
       } else {
         for([index, value] of items.entries()) {
-          if(value.name.toLowerCase() === text.toLowerCase()) {
+          if(value.name.toLowerCase() === textInput.toLowerCase()) {
             updatedItems[index].amount = updatedItems[index].amount + 1
             updatedItems[index].geolocations.push(coordinates)
           }
         }
+        setItems(updatedItems) 
       }
     }
 
@@ -259,6 +268,55 @@ export default AddRecording = ({route, navigation}) => {
     else
       setPreviewModal(null)
   }
+
+  const formatTime = (number) => {
+    if (number < 10)
+      number = "0" + Math.round(number).toFixed(0)
+    else
+     number = Math.round(number).toFixed(0)
+
+    return number
+  }
+
+  const calcTotalAmount = () => {
+    let total = 0
+    return new Promise((resolve, reject) => {
+      items.forEach((item, index, array) => {
+        total += item.amount
+        if (index === array.length -1) 
+          resolve(total);
+      });
+    });
+  }
+
+  const sendData = () => {
+    let endTime = new Date().getTime()
+    let resolution = endTime - startTime
+    let seconds = (resolution / 1000) // seconds go over 60 FIX THIS
+    let minutes = ((resolution / 1000) / 60)
+    let hours = (((resolution / 1000) / 60)/ 60)
+
+    seconds = formatTime(seconds)
+    minutes = formatTime(minutes)
+    hours = formatTime(hours)
+
+    console.log(`${hours}:${minutes}:${seconds}` )
+    let date = new Date()
+
+    calcTotalAmount().then((total) => {
+      let data = {
+        time: `${hours}:${minutes}:${seconds}`,
+        itemsAmount: total,
+        date: date,
+        items: items
+      }
+  
+      database()
+      .ref(`/recordings/${date}/`)
+      .set(data)
+      .then(() => navigation.navigate('SummaryView', { data: data }));
+    })
+  }
   
 
   let itemsList
@@ -301,7 +359,7 @@ export default AddRecording = ({route, navigation}) => {
           </TouchableOpacity>
           <TextInput
             placeholder={'E.g. Plastic bag'}
-            onSubmitEditing={() => handleTextInput(textInput)}
+            onSubmitEditing={() => handleTextInput()}
             returnKeyType={'done'}
             clearButtonMode={"while-editing"}
             placeholderTextColor={'lightgray'}
@@ -310,7 +368,7 @@ export default AddRecording = ({route, navigation}) => {
             onChangeText={text => setTextInput(text)}
             value={textInput}
           />
-          <TouchableOpacity onPress={() => handleTextInput(textInput)}>
+          <TouchableOpacity onPress={() => handleTextInput()}>
             <Feather name={'arrow-right-circle'} size={30} color={'black'} style={{paddingTop: 0}}/>
           </TouchableOpacity>
         </View>
@@ -337,7 +395,7 @@ export default AddRecording = ({route, navigation}) => {
         </View>
 
       </ScrollView>
-      <TouchableOpacity onPress={() => console.log('ended')} style={styles.finishButton}>
+      <TouchableOpacity onPress={() => sendData()} style={styles.finishButton}>
         <FontAwesome5 name={'flag-checkered'} size={30} color={'white'}/>
       </TouchableOpacity>
     </Layout>
