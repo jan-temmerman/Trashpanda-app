@@ -13,6 +13,7 @@ import Profile from './views/Profile';
 import MapView from './views/MapView';
 import AddRecording from './views/AddRecording';
 import NewRecording from './views/NewRecording';
+import CameraView from './views/CameraView';
 
 function OnboardStack() {
   const OnboardStack = createStackNavigator();
@@ -87,7 +88,8 @@ export default App = () => {
       <RecordingsStack.Navigator screenOptions={{headerShown: false}}>
         <RecordingsStack.Screen name="HomeTabs" component={HomeTabs} />
         <RecordingsStack.Screen name="AddRecording" component={AddRecording} />
-        <RecordingsStack.Screen options={{ gestureEnabled: true }} name="NewRecording" component={NewRecording} />
+        <RecordingsStack.Screen options={{ gestureEnabled: true }} name="NewRecording" component={NewRecording} initialParams={{itemIndex: null, imageUri: null}}/>
+        <RecordingsStack.Screen options={{ gestureEnabled: true }} name="CameraView" component={CameraView} />
       </RecordingsStack.Navigator>
     </NavigationContainer>
   );

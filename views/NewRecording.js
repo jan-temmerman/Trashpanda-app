@@ -1,30 +1,137 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import Carousel from 'react-native-carousel-view';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Feather from 'react-native-vector-icons/Feather';
+import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dash from 'react-native-dash';
 
 // Components
 import Layout from '../components/layout';
-import Heading from '../components/text/heading';
-import Paragraph from '../components/text/paragraph';
+import ListItem from '../components/listItem';
+import Suggestion from '../components/suggestion'
 
-export default AddRecording = ({navigation}) => {
+export default AddRecording = ({route, navigation}) => {
+  const { itemIndex } = route.params; 
+  const { imageUri } = route.params; 
+
   const [textInput, setTextInput] = useState("")
   const [micOn, setMicOn] = useState(true)
-  const [micIcon, setMicIcon] = useState(<MaterialCommunityIcons name={'microphone-off'} size={30} color={'black'} style={{paddingTop: 1}}/>)
+  const [micIcon, setMicIcon] = useState(<MaterialCommunityIcons name={'microphone-off'} size={26} color={'black'} style={{paddingTop: 3}}/>)
+  const [items, setItems] = useState([
+    {
+      name: 'Coca-cola can',
+      amount: 13,
+      imageUri: "",
+    },
+    {
+      name: 'Jupiler can',
+      amount: 92,
+      imageUri: "",
+    },
+    {
+      name: 'Cigarette',
+      amount: 21,
+      imageUri: "",
+    },
+    {
+      name: 'Plastic bag',
+      amount: 2,
+      imageUri: "",
+    },
+  ])
+  
+  useEffect(() => {
+    console.log(itemIndex + ', ' + imageUri)
+    if(itemIndex != null)
+      setImageUri(itemIndex, imageUri)
+    return
+  }, [itemIndex])
 
   const toggleMic = () => {
     if(micOn) {
-      setMicIcon(<MaterialCommunityIcons name={'microphone'} size={30} color={'black'} style={{paddingTop: 1}}/>)
+      setMicIcon(<MaterialCommunityIcons name={'microphone'} size={26} color={'black'} style={{paddingTop: 3}}/>)
       setMicOn(false)
     } else if(!micOn) {
-      setMicIcon(<MaterialCommunityIcons name={'microphone-off'} size={30} color={'black'} style={{paddingTop: 1}}/>)
+      setMicIcon(<MaterialCommunityIcons name={'microphone-off'} size={26} color={'black'} style={{paddingTop: 3}}/>)
       setMicOn(true)
     }
+  }
+
+  const updateAmount = (index, action) => {
+    if(action === 'increment'){
+      let oldItems = [...items]
+      oldItems[index].amount = oldItems[index].amount + 1
+      let updatedItems = oldItems
+      
+      setItems(updatedItems)
+    } else if(action === 'decrement') {
+      let oldItems = [...items]
+      if(oldItems[index].amount > 0) {
+        oldItems[index].amount = oldItems[index].amount - 1
+        let updatedItems = oldItems
+        
+        setItems(updatedItems)
+      }
+    }
+  }
+
+  const isAlreadyInList = (text) => {
+    for(item of items) {
+      if(item.name.toLowerCase() === text.toLowerCase()) {
+        return true
+      }
+    }
+    return false
+  }
+
+  const setImageUri = (index, imageUri) => {
+    let oldItems = [...items]
+    oldItems[index].imageUri = imageUri
+    let updatedItems = oldItems
+    setItems(updatedItems)
+    console.log(items)
+  }
+
+  const handleTextInput = (text) => {
+    let updatedItems = [...items]
+    
+    if(!isAlreadyInList(text)) {
+      updatedItems.push({
+        name: text,
+        amount: 0
+      })
+      
+      setItems(updatedItems) 
+    } else {
+      for([index, value] of items.entries()) {
+        if(value.name.toLowerCase() === text.toLowerCase()) {
+          updatedItems[index].amount = updatedItems[index].amount + 1
+        }
+      }
+      setItems(updatedItems) 
+    }
+
+    setTextInput("")
+  }
+
+  const askForDeletion = ( itemAmount, itemName, index) => {
+    Alert.alert(
+      "Delete item?",
+      `Do you want to delete ${itemAmount}x ${itemName}?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        { text: "Yes", onPress: () => deleteItem(index) }
+      ],
+      { cancelable: false }
+    );
+  }
+
+  const deleteItem = (index) => {
+    let updatedItems = [...items]
+    updatedItems.splice(index, 1)
+    setItems(updatedItems)
   }
   
   return (
@@ -43,25 +150,22 @@ export default AddRecording = ({navigation}) => {
             {micIcon}
           </TouchableOpacity>
           <TextInput
+            placeholder={'E.g. Plastic bag'}
+            onSubmitEditing={(event) => handleTextInput(event.nativeEvent.text)}
+            returnKeyType={'done'}
             clearButtonMode={"while-editing"}
-            style={{ height: '100%', flex: 1, marginLeft: 4}}
+            placeholderTextColor={'lightgray'}
+            selectionColor={'black'}
+            style={{ height: '100%', flex: 1, marginLeft: 4, color: 'black', fontSize: 16}}
             onChangeText={text => setTextInput(text)}
             value={textInput}
           />
         </View>
 
         <View style={styles.suggestionContainer}>
-          <TouchableOpacity style={styles.suggestion} onPress={() => setTextInput("Coca-cola can")}>
-            <Text style={styles.suggestionText}>Coca-cola can</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.suggestion} onPress={() => setTextInput("Jupiler can")}>
-            <Text style={styles.suggestionText}>Jupiler can</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.suggestion} onPress={() => setTextInput("Plastig bag")}>
-            <Text style={styles.suggestionText}>Plastig bag</Text>
-          </TouchableOpacity>
+          <Suggestion text={"Coca-cola can"} setTextInput={(text) => setTextInput(text)}/>
+          <Suggestion text={"Jupiler can"} setTextInput={(text) => setTextInput(text)}/>
+          <Suggestion text={"Plastic bag"} setTextInput={(text) => setTextInput(text)}/>
         </View>
 
         <View style={styles.listContainer}>
@@ -72,66 +176,25 @@ export default AddRecording = ({navigation}) => {
               marginBottom: 10,
               fontFamily: 'Montserrat-Bold',
             }}>Current list</Text>
+
             <Dash style={{width:'100%', height: 1,}} dashGap={2} dashLength={12} dashColor={"#707070"} />
-
-            <View style={styles.itemContainer}>
-
-              <View style={styles.amountContainer}>
-                <TouchableOpacity style={styles.minusButton}>
-                  <AntDesign name={'minus'} size={34} color={'white'}/>
-                </TouchableOpacity>
-                <Text style={styles.amountText}>12</Text>
-                <TouchableOpacity style={styles.plusButton}>
-                  <AntDesign name={'plus'} size={28} color={'black'}/>
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.itemText} numberOfLines={1}>Coca-cola can</Text>
-
-              <TouchableOpacity style={styles.cameraButton}>
-                <Feather name={'camera'} size={24} color={'gray'}/>
-              </TouchableOpacity>
-            </View>
-            <Dash style={{width:'100%', height: 1}} dashGap={2} dashLength={12} dashColor={"#DDDADA"} />
-
-            <View style={styles.itemContainer}>
-
-              <View style={styles.amountContainer}>
-                <TouchableOpacity style={styles.minusButton}>
-                  <AntDesign name={'minus'} size={34} color={'white'}/>
-                </TouchableOpacity>
-                <Text style={styles.amountText}>9</Text>
-                <TouchableOpacity style={styles.plusButton}>
-                  <AntDesign name={'plus'} size={28} color={'black'}/>
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.itemText} numberOfLines={1}>Cigarette</Text>
-
-              <TouchableOpacity style={styles.cameraButton}>
-                <Feather name={'camera'} size={24} color={'gray'}/>
-              </TouchableOpacity>
-            </View>
-            <Dash style={{width:'100%', height: 1}} dashGap={2} dashLength={12} dashColor={"#DDDADA"} />
-
-            <View style={styles.itemContainer}>
-
-              <View style={styles.amountContainer}>
-                <TouchableOpacity style={styles.minusButton}>
-                  <AntDesign name={'minus'} size={34} color={'white'}/>
-                </TouchableOpacity>
-                <Text style={styles.amountText}>4</Text>
-                <TouchableOpacity style={styles.plusButton}>
-                  <AntDesign name={'plus'} size={28} color={'black'}/>
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.itemText} numberOfLines={1}>Jupiler can</Text>
-
-              <TouchableOpacity style={styles.cameraButton}>
-                <Feather name={'camera'} size={24} color={'gray'}/>
-              </TouchableOpacity>
-            </View>
+            
+            {
+              items.map((item, index) => {
+                return (
+                  <ListItem 
+                    key={index}
+                    imageUri={item.imageUri}
+                    askForDeletion={(itemAmount, itemName, index) => askForDeletion(itemAmount, itemName, index)}
+                    navigation={navigation}
+                    index={index}
+                    itemAmount={item.amount}
+                    itemName={item.name}
+                    updateAmount={(index, action) => updateAmount(index, action)}
+                  />
+                )
+              })
+            }
 
         </View>
 
@@ -160,75 +223,8 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingTop: 14
   },
-  minusButton: {
-    paddingTop: 1,
-    paddingLeft: 1,
-    height: 36,
-    width: 36,
-    borderRadius: 18,
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  plusButton: {
-    paddingTop: 4,
-    paddingLeft: 1,
-    height: 36,
-    width: 36,
-    borderRadius: 18,
-    backgroundColor: '#ffb800',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  itemText: {
-    alignSelf: 'center',
-    fontSize: 16,
-    width: '50%',
-    fontFamily: 'Montserrat-Regular',
-  },
-  amountText: {
-    alignSelf: 'center',
-    fontSize: 16,
-    fontFamily: 'Montserrat-Regular',
-  },
-  cameraButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 10,
-    borderStyle: 'dashed',
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingLeft: 1,
-    paddingBottom: 1
-  },
-  itemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 8,
-    paddingBottom: 8,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  amountContainer: {
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    width: '32%', 
-    justifyContent: 'space-between'
-  },
-  suggestion: {
-    padding: 6,
-    paddingLeft: 8,
-    paddingRight: 8,
-    backgroundColor: 'white',
-    borderRadius: 30,
-    marginRight: 4
-  },
   suggestionContainer: {
     width: '100%',
     flexDirection: 'row',
   },
-  suggestionText: {
-    fontFamily: 'Montserrat-Regular',
-  }
 });

@@ -44,7 +44,7 @@ export default AddRecording = ({navigation}) => {
 
           <View style={{marginTop: 28,alignItems: 'center'}}>
             <View style={{width: '75%', marginBottom: 10}}>
-              <Heading text={"Adding items using the keyboard."} textAlign={"left"}/>
+              <Heading text={"Adding items using the \n keyboard."} textAlign={"left"}/>
             </View>
             <View style={{width: '75%', flexDirection: 'row', justifyContent: 'space-between'}}>
               
