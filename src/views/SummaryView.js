@@ -8,23 +8,22 @@ MapboxGL.setAccessToken('pk.eyJ1IjoiamFudGVtbWUiLCJhIjoiY2s5ZjBhM3Y5MDZwMDNubzdv
 // Components
 import Layout from '../components/layout';
 
-export default SummaryView = ({route}) => {
+export default function SummaryView({ route }) {
   const { data } = route.params;
 
   return (
-    <Layout headerTitle={"Summary"}>
-      <Text style={styles.heading}>{`${data.date.getUTCDate()}/${data.date.getUTCMonth()}/${data.date.getUTCFullYear()}`}</Text>
-      <View style={{width: '100%', height: '28%'}}>
+    <Layout headerTitle={'Summary'}>
+      <Text
+        style={styles.heading}
+      >{`${data.date.getUTCDate()}/${data.date.getUTCMonth()}/${data.date.getUTCFullYear()}`}</Text>
+      <View style={{ width: '100%', height: '28%' }}>
         <MapboxGL.MapView
-            showUserLocation={true}
-            userTrackingMode={MapboxGL.UserTrackingModes.Follow}
-            styleURL={MapboxGL.StyleURL.Street}
-            style={{flex: 1, width: '100%', height: '20%'}}
-          >
-          <MapboxGL.Camera
-            zoomLevel={12}
-            centerCoordinate={[3.72377, 51.05]}
-          />
+          showUserLocation={true}
+          userTrackingMode={MapboxGL.UserTrackingModes.Follow}
+          styleURL={MapboxGL.StyleURL.Street}
+          style={{ flex: 1, width: '100%', height: '20%' }}
+        >
+          <MapboxGL.Camera zoomLevel={12} centerCoordinate={[3.72377, 51.05]} />
         </MapboxGL.MapView>
       </View>
     </Layout>

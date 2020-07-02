@@ -1,5 +1,5 @@
 PODS:
-  - "@react-native-mapbox-gl-mapbox-static (5.7.0)"
+  - "@react-native-mapbox-gl-mapbox-static (5.8.0)"
   - boost-for-react-native (1.63.0)
   - DoubleConversion (1.1.6)
   - EXConstants (9.0.0):
@@ -304,19 +304,19 @@ PODS:
     - React
   - react-native-geolocation (2.0.2):
     - React
-  - react-native-mapbox-gl (8.0.0):
-    - "@react-native-mapbox-gl-mapbox-static (~> 5.7)"
-    - Mapbox-iOS-SDK (~> 5.7)
+  - react-native-mapbox-gl (8.1.0-rc.2):
+    - "@react-native-mapbox-gl-mapbox-static (~> 5.8)"
+    - Mapbox-iOS-SDK (~> 5.8)
     - React
-    - react-native-mapbox-gl/DynamicLibrary (= 8.0.0)
-    - react-native-mapbox-gl/StaticLibraryFixer (= 8.0.0)
-  - react-native-mapbox-gl/DynamicLibrary (8.0.0):
-    - "@react-native-mapbox-gl-mapbox-static (~> 5.7)"
-    - Mapbox-iOS-SDK (~> 5.7)
+    - react-native-mapbox-gl/DynamicLibrary (= 8.1.0-rc.2)
+    - react-native-mapbox-gl/StaticLibraryFixer (= 8.1.0-rc.2)
+  - react-native-mapbox-gl/DynamicLibrary (8.1.0-rc.2):
+    - "@react-native-mapbox-gl-mapbox-static (~> 5.8)"
+    - Mapbox-iOS-SDK (~> 5.8)
     - React
-  - react-native-mapbox-gl/StaticLibraryFixer (8.0.0):
-    - "@react-native-mapbox-gl-mapbox-static (~> 5.7)"
-    - Mapbox-iOS-SDK (~> 5.7)
+  - react-native-mapbox-gl/StaticLibraryFixer (8.1.0-rc.2):
+    - "@react-native-mapbox-gl-mapbox-static (~> 5.8)"
+    - Mapbox-iOS-SDK (~> 5.8)
     - React
   - react-native-safe-area-context (0.7.3):
     - React
@@ -639,7 +639,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  "@react-native-mapbox-gl-mapbox-static": 1d700f32d43136ed9cbae1d0be9107489613e23d
+  "@react-native-mapbox-gl-mapbox-static": e247172bc43f47757f47d6cec1b325b1ab3e9287
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   EXConstants: 9f18e9ef229706394f41735d9c7f309d479b36c0
@@ -686,7 +686,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
   react-native-camera: 6fe72fd0a85732e2449928f9c59a2e0bf661ad3b
   react-native-geolocation: cbd9d6bd06bac411eed2671810f454d4908484a8
-  react-native-mapbox-gl: 77b87a1dd2d7b41b6b77018c0f3bed5f8ee55c81
+  react-native-mapbox-gl: 18785637738ca8b25c3633db431d6614ec7fc9bf
   react-native-safe-area-context: 8260e5157617df4b72865f44006797f895b2ada7
   react-native-voice: f984ded3caa25a97472f2d99faf640ede9a37a98
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
@@ -724,4 +724,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: a6b64639cdba9ed43b43b0cce854994f8aa40904
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.9.3

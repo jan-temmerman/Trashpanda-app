@@ -3,17 +3,18 @@ import React, { Children } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar } from 'react-native';
 
 // Components
-import Header from '../components/header'
+import Header from './header';
 
-export default Layout = (props) => {
-
+export default function Layout(props) {
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={'dark-content'}/>
-      <Header title={props.headerTitle} navigationObject={props.navigationObject} backButtonVisible={props.backButtonVisible}/>
-      <View style={styles.background}>
-        {props.children}
-      </View>
+      <StatusBar barStyle={'dark-content'} />
+      <Header
+        title={props.headerTitle}
+        navigationObject={props.navigationObject}
+        backButtonVisible={props.backButtonVisible}
+      />
+      <View style={styles.background}>{props.children}</View>
     </SafeAreaView>
   );
 }

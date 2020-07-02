@@ -5,8 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome5';
 
 // Components
 
-export default Card = (props) => {
-
+export default function Card(props) {
   return (
     <View style={styles.card}>
       <View>
@@ -16,17 +15,17 @@ export default Card = (props) => {
 
       <View style={styles.widgetsContainer}>
         <View style={styles.widgetContainer}>
-          <FontAwesome name={'walking'} size={24} color={'black'}/>
+          <FontAwesome name={'walking'} size={24} color={'black'} />
           <Text style={styles.widgetText}>{props.distance} Km</Text>
         </View>
 
         <View style={styles.widgetContainer}>
-          <FontAwesome name={'trash'} size={18} color={'black'}/>
+          <FontAwesome name={'trash'} size={18} color={'black'} />
           <Text style={styles.widgetText}>{props.itemsCount}</Text>
         </View>
-        
+
         <View style={styles.widgetContainer}>
-          <FontAwesome name={'clock'} size={20} color={'black'}/>
+          <FontAwesome name={'clock'} size={20} color={'black'} />
           <Text style={styles.widgetText}>{props.time}</Text>
         </View>
       </View>
@@ -45,7 +44,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: 14,
     paddingLeft: 18,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.29,
     shadowRadius: 4.65,
@@ -55,21 +54,21 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     fontSize: 15,
     marginLeft: 0,
-    fontFamily: 'Montserrat-Semibold'
+    fontFamily: 'Montserrat-Semibold',
   },
   widgetsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '80%'
+    width: '80%',
   },
   widgetContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '33.33333%'
+    width: '33.33333%',
   },
   widgetText: {
     marginLeft: 8,
     fontSize: 12,
-    fontFamily: 'Montserrat-Regular'
-  }
+    fontFamily: 'Montserrat-Regular',
+  },
 });

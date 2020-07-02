@@ -8,19 +8,19 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Views
-import MyRecordings from './views/MyRecordings';
-import Profile from './views/Profile';
-import MapView from './views/MapView';
-import AddRecording from './views/AddRecording';
-import NewRecording from './views/NewRecording';
-import CameraView from './views/CameraView';
-import SummaryView from './views/SummaryView';
+import MyRecordings from './src/views/MyRecordings';
+import Profile from './src/views/Profile';
+import MapView from './src/views/MapView';
+import AddRecording from './src/views/AddRecording';
+import NewRecording from './src/views/NewRecording';
+import CameraView from './src/views/CameraView';
+import SummaryView from './src/views/SummaryView';
 
 function OnboardStack() {
   const OnboardStack = createStackNavigator();
 
   return (
-    <OnboardStack.Navigator screenOptions={{headerShown: false}}>
+    <OnboardStack.Navigator screenOptions={{ headerShown: false }}>
       <OnboardStack.Screen name="MyRecordings" component={MyRecordings} />
       <OnboardStack.Screen name="AddRecording" component={AddRecording} />
     </OnboardStack.Navigator>
@@ -31,22 +31,23 @@ function HomeTabs() {
   const Tab = createBottomTabNavigator();
 
   return (
-    <Tab.Navigator initialRouteName="MyRecordings"
+    <Tab.Navigator
+      initialRouteName="MyRecordings"
       screenOptions={({ route }) => ({
-      headerShown: false,
-      tabBarIcon: ({ focused, color, size }) => {
-        let iconName;
+        headerShown: false,
+        tabBarIcon: function Icon({ focused, color, size }) {
+          let iconName;
 
-        if (route.name === 'MyRecordings') {
-          iconName = 'ios-list'
-        } else if (route.name === 'MapView') {
-          iconName = 'md-map'
-        } else if (route.name === 'Profile') {
-          iconName = 'md-person'
-        }
+          if (route.name === 'MyRecordings') {
+            iconName = 'ios-list';
+          } else if (route.name === 'MapView') {
+            iconName = 'md-map';
+          } else if (route.name === 'Profile') {
+            iconName = 'md-person';
+          }
 
-        return <Ionicons name={iconName} size={34} color={color}/>;
-      },
+          return <Ionicons name={iconName} size={34} color={color} />;
+        },
       })}
       tabBarOptions={{
         activeTintColor: 'black',
@@ -57,12 +58,12 @@ function HomeTabs() {
         style: {
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
-          backgroundColor:"#FFF",
-          position:'absolute',
+          backgroundColor: '#FFF',
+          position: 'absolute',
           padding: 2,
           paddingLeft: 18,
           paddingRight: 18,
-          shadowColor: "#000",
+          shadowColor: '#000',
           shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.29,
           shadowRadius: 4.65,
@@ -71,26 +72,36 @@ function HomeTabs() {
         tabStyle: {
           borderRadius: 8,
           margin: 2,
-        }
-    }}>
-      <Tab.Screen name="MapView" component={MapView}/>
-      <Tab.Screen name="MyRecordings" component={OnboardStack}/>
-      <Tab.Screen name="Profile" component={Profile}/>
+        },
+      }}
+    >
+      <Tab.Screen name="MapView" component={MapView} />
+      <Tab.Screen name="MyRecordings" component={OnboardStack} />
+      <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );
 }
 
-export default App = () => {
-
+export default function App() {
   const RecordingsStack = createStackNavigator();
 
   return (
     <NavigationContainer>
-      <RecordingsStack.Navigator screenOptions={{headerShown: false}}>
+      <RecordingsStack.Navigator screenOptions={{ headerShown: false }}>
         <RecordingsStack.Screen name="HomeTabs" component={HomeTabs} />
         <RecordingsStack.Screen name="AddRecording" component={AddRecording} />
-        <RecordingsStack.Screen options={{ gestureEnabled: true }} name="NewRecording" component={NewRecording} initialParams={{itemIndex: null, imageUri: null}}/>
-        <RecordingsStack.Screen options={{ gestureEnabled: true }} name="SummaryView" component={SummaryView} initialParams={{data: null}}/>
+        <RecordingsStack.Screen
+          options={{ gestureEnabled: true }}
+          name="NewRecording"
+          component={NewRecording}
+          initialParams={{ itemIndex: null, imageUri: null }}
+        />
+        <RecordingsStack.Screen
+          options={{ gestureEnabled: true }}
+          name="SummaryView"
+          component={SummaryView}
+          initialParams={{ data: null }}
+        />
         <RecordingsStack.Screen options={{ gestureEnabled: true }} name="CameraView" component={CameraView} />
       </RecordingsStack.Navigator>
     </NavigationContainer>
@@ -105,7 +116,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
   header: {
-    alignSelf: 'flex-start'
+    alignSelf: 'flex-start',
   },
   welcome: {
     fontSize: 20,
