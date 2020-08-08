@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View, Dimensions, TextInput } from 'react-native';
 import Voice from '@react-native-community/voice';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import auth from '@react-native-firebase/auth';
 
 // Components
 import EmptyListPlaceholder from '../components/emptyListPlaceholder';
@@ -14,18 +15,64 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 export default function Profile({ navigation }) {
   const [itemsList, setItemsList] = useState([]);
   const [itemsListRendered, setItemsListRendered] = useState();
-  const [username, setUsername] = useState('JanTemme');
-  const [email, setEmail] = useState('temmjan@gmail.com');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [userLoggedIn, setUserLoggedIn] = useState(false);
 
-  let currentResult;
   const windowWidth = Dimensions.get('window').width;
   const photoWidth = windowWidth * 0.25;
 
   useEffect(() => {
-    console.log(currentResult);
+    if (auth().currentUser) setUserLoggedIn(true);
+    else setUserLoggedIn(false);
+
+    auth().onAuthStateChanged((user) => {
+      if (user) {
+        setUserLoggedIn(true);
+        console.log(user);
+        if (user.displayName) setUsername(user.displayName);
+        setEmail(user.email);
+      } else setUserLoggedIn(false);
+    });
+
     return;
-  }, [currentResult]);
+  }, []);
+
+  const updateProfile = () => {
+    var user = auth().currentUser;
+
+    user
+      .updateProfile({
+        displayName: username,
+        photoURL: null,
+      })
+      .then(function (e) {
+        console.log(e);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+    user
+      .updateEmail(email)
+      .then(function (e) {
+        console.log(e);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const signOut = () => {
+    auth()
+      .signOut()
+      .then((e) => {
+        console.log(e);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   if (userLoggedIn)
     return (
@@ -67,11 +114,11 @@ export default function Profile({ navigation }) {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.mainButton}>
+        <TouchableOpacity style={styles.mainButton} onPress={() => updateProfile()}>
           <Text style={styles.mainButtonText}>Update</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.secundaryButton}>
+        <TouchableOpacity style={styles.secundaryButton} onPress={() => signOut()}>
           <Text style={styles.secundaryButtonText}>Logout</Text>
         </TouchableOpacity>
       </Layout>

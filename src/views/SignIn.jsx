@@ -40,6 +40,7 @@ export default function SignIn({ navigation }) {
             selectionColor="black"
             keyboardType="email-address"
             textContentType="emailAddress"
+            autoCapitalize="none"
             style={styles.textInput}
             onChangeText={(text) => setEmail(text)}
             value={email}
