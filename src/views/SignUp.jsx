@@ -1,12 +1,9 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View, Dimensions, TextInput, Image } from 'react-native';
-import Voice from '@react-native-community/voice';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Button, StyleSheet, Text, View, Dimensions, TextInput, Image, ActivityIndicator } from 'react-native';
 import auth from '@react-native-firebase/auth';
 
 // Components
-import EmptyListPlaceholder from '../components/emptyListPlaceholder';
 import Layout from '../components/layout';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -14,16 +11,34 @@ export default function SignUp({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatedPassword, setRepeatedPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isBusy, setIsBusy] = useState(false);
 
   const signUp = () => {
-    auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then((e) => console.log(e))
-      .catch(function (error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-      });
+    setIsBusy(true);
+    if (password === repeatedPassword)
+      auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then((e) => {
+          console.log(e);
+          setIsBusy(false);
+          navigation.navigate('Profile');
+        })
+        .catch(function (error) {
+          setIsBusy(false);
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+        });
+    else {
+      setError("Passwords don't match.");
+      setIsBusy(false);
+    }
+  };
+
+  const renderButtonContent = () => {
+    if (isBusy) return <ActivityIndicator size="small" color="#FFFFFF" />;
+    else return <Text style={styles.mainButtonText}>Sign In</Text>;
   };
 
   return (
@@ -41,6 +56,7 @@ export default function SignUp({ navigation }) {
             selectionColor="black"
             keyboardType="email-address"
             textContentType="emailAddress"
+            autoCapitalize="none"
             style={styles.textInput}
             onChangeText={(text) => setEmail(text)}
             value={email}
@@ -58,7 +74,6 @@ export default function SignUp({ navigation }) {
             placeholderTextColor="lightgray"
             selectionColor="black"
             keyboardType="default"
-            textContentType="password"
             secureTextEntry={true}
             style={styles.textInput}
             onChangeText={(text) => setPassword(text)}
@@ -87,7 +102,7 @@ export default function SignUp({ navigation }) {
       </View>
 
       <TouchableOpacity style={styles.mainButton} onPress={() => signUp()}>
-        <Text style={styles.mainButtonText}>Sign up</Text>
+        {renderButtonContent()}
       </TouchableOpacity>
     </Layout>
   );

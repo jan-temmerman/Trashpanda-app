@@ -31,6 +31,7 @@ export default function Profile({ navigation }) {
         setUserLoggedIn(true);
         console.log(user);
         if (user.displayName) setUsername(user.displayName);
+        else setUsername('');
         setEmail(user.email);
       } else setUserLoggedIn(false);
     });
@@ -107,6 +108,7 @@ export default function Profile({ navigation }) {
               placeholderTextColor="lightgray"
               selectionColor="black"
               keyboardType="email-address"
+              autoCapitalize="none"
               style={styles.textInput}
               onChangeText={(text) => setEmail(text)}
               value={email}

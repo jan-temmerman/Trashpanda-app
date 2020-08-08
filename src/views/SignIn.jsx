@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View, Dimensions, TextInput, Image } from 'react-native';
+import { Button, StyleSheet, Text, View, Dimensions, TextInput, Image, ActivityIndicator } from 'react-native';
 import Voice from '@react-native-community/voice';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import auth from '@react-native-firebase/auth';
@@ -13,16 +13,28 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 export default function SignIn({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isBusy, setIsBusy] = useState(false);
 
   const signIn = () => {
+    setIsBusy(true);
     auth()
       .signInWithEmailAndPassword(email, password)
-      .then((e) => console.log(e))
+      .then((e) => {
+        console.log(e);
+        setIsBusy(false);
+        navigation.navigate('Profile');
+      })
       .catch(function (error) {
+        setIsBusy(false);
         var errorCode = error.code;
         var errorMessage = error.message;
         console.log(errorCode, errorMessage);
       });
+  };
+
+  const renderButtonContent = () => {
+    if (isBusy) return <ActivityIndicator size="small" color="#FFFFFF" />;
+    else return <Text style={styles.mainButtonText}>Sign In</Text>;
   };
 
   return (
@@ -68,7 +80,7 @@ export default function SignIn({ navigation }) {
       </View>
 
       <TouchableOpacity style={styles.mainButton} onPress={() => signIn()}>
-        <Text style={styles.mainButtonText}>Sign In</Text>
+        {renderButtonContent()}
       </TouchableOpacity>
     </Layout>
   );
