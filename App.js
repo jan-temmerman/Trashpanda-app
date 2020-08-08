@@ -15,6 +15,9 @@ import AddRecording from './src/views/AddRecording';
 import NewRecording from './src/views/NewRecording';
 import CameraView from './src/views/CameraView';
 import SummaryView from './src/views/SummaryView';
+import DetailView from './src/views/DetailView';
+import SignIn from './src/views/SignIn';
+import SignUp from './src/views/SignUp';
 
 function OnboardStack() {
   const OnboardStack = createStackNavigator();
@@ -23,6 +26,7 @@ function OnboardStack() {
     <OnboardStack.Navigator screenOptions={{ headerShown: false }}>
       <OnboardStack.Screen name="MyRecordings" component={MyRecordings} />
       <OnboardStack.Screen name="AddRecording" component={AddRecording} />
+      <OnboardStack.Screen name="Detail" initialParams={{ data: null }} component={DetailView} />
     </OnboardStack.Navigator>
   );
 }
@@ -90,6 +94,9 @@ export default function App() {
       <RecordingsStack.Navigator screenOptions={{ headerShown: false }}>
         <RecordingsStack.Screen name="HomeTabs" component={HomeTabs} />
         <RecordingsStack.Screen name="AddRecording" component={AddRecording} />
+        <RecordingsStack.Screen name="SignUp" component={SignUp} />
+        <RecordingsStack.Screen name="SignIn" component={SignIn} />
+        <RecordingsStack.Screen name="Detail" initialParams={{ data: null }} component={DetailView} />
         <RecordingsStack.Screen
           options={{ gestureEnabled: true }}
           name="NewRecording"

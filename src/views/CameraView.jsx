@@ -59,7 +59,6 @@ export default function CameraView({ route, navigation }) {
     if (cameraRef.current) {
       const options = { quality: 1, base64: true };
       const data = await cameraRef.current.takePictureAsync(options);
-      console.log(data.uri);
       setImageUri(data.uri);
     }
   };

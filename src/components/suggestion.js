@@ -12,9 +12,9 @@ export default function Suggestion(props) {
 
 const styles = StyleSheet.create({
   suggestion: {
-    padding: 6,
-    paddingLeft: 8,
-    paddingRight: 8,
+    padding: 8,
+    paddingLeft: 12,
+    paddingRight: 12,
     backgroundColor: 'white',
     borderRadius: 30,
     marginRight: 4,

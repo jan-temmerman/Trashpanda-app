@@ -11,9 +11,9 @@ export default Heading = (props) => {
       <Text style={{
         alignSelf: 'center',
         textAlign: props.textAlign,
-        fontSize: 18,
+        fontSize: 22,
         marginBottom: 14,
-        fontFamily: 'Montserrat-Bold',
+        fontFamily: 'Montserrat-Extrabold',
       }}>{props.text}</Text>
     </View>
   );

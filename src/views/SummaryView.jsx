@@ -1,7 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
-import Voice from '@react-native-community/voice';
+import { YellowBox, StyleSheet, Text, View, Image } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 MapboxGL.setAccessToken('pk.eyJ1IjoiamFudGVtbWUiLCJhIjoiY2s5ZjBhM3Y5MDZwMDNubzdvb3E2Z2ZjNCJ9.zQuSQryovj4h_w6Eg6cmyg');
 
@@ -9,7 +8,13 @@ MapboxGL.setAccessToken('pk.eyJ1IjoiamFudGVtbWUiLCJhIjoiY2s5ZjBhM3Y5MDZwMDNubzdv
 import Layout from '../components/layout';
 
 export default function SummaryView({ route }) {
+  YellowBox.ignoreWarnings(['Non-serializable values were found in the navigation state']);
   const { data } = route.params;
+
+  useEffect(() => {
+    console.log(data);
+    return;
+  }, []);
 
   return (
     <Layout headerTitle={'Summary'}>
@@ -26,6 +31,10 @@ export default function SummaryView({ route }) {
           <MapboxGL.Camera zoomLevel={12} centerCoordinate={[3.72377, 51.05]} />
         </MapboxGL.MapView>
       </View>
+      <Image
+        style={{ width: '90%', height: '20%', margin: 10, borderRadius: 10 }}
+        source={{ uri: data.items[0].imageUri }}
+      />
     </Layout>
   );
 }

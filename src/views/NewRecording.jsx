@@ -22,7 +22,7 @@ export default function NewRecording({ route, navigation }) {
   const [textInput, setTextInput] = useState('');
   const [micOn, setMicOn] = useState(true);
   const [micIcon, setMicIcon] = useState(
-    <MaterialCommunityIcons name="microphone-off" size={26} color="black" style={{ paddingTop: 3 }} />,
+    <MaterialCommunityIcons name="microphone-off" size={30} color="black" style={{ paddingTop: 3 }} />,
   );
   const [previewModal, setPreviewModal] = useState(null);
   const [items, setItems] = useState([]);
@@ -109,11 +109,11 @@ export default function NewRecording({ route, navigation }) {
   const toggleMic = () => {
     if (micOn) {
       handleMircophone('stop');
-      setMicIcon(<MaterialCommunityIcons name="microphone" size={26} color="black" style={{ paddingTop: 3 }} />);
+      setMicIcon(<MaterialCommunityIcons name="microphone" size={30} color="black" style={{ paddingTop: 3 }} />);
       setMicOn(false);
     } else if (!micOn) {
       handleMircophone('start');
-      setMicIcon(<MaterialCommunityIcons name="microphone-off" size={26} color="black" style={{ paddingTop: 3 }} />);
+      setMicIcon(<MaterialCommunityIcons name="microphone-off" size={30} color="black" style={{ paddingTop: 3 }} />);
       setMicOn(true);
     }
   };
@@ -267,7 +267,7 @@ export default function NewRecording({ route, navigation }) {
             justifyContent: 'flex-end',
           }}
         >
-          <Image style={{ width: '100%', height: '100%' }} source={{ uri: imageUri }} />
+          <Image style={{ width: '100%', height: '100%', backgroundColor: 'red' }} source={{ uri: imageUri }} />
           <TouchableOpacity
             onPress={() => setPreviewModal(null)}
             style={{
@@ -401,7 +401,7 @@ export default function NewRecording({ route, navigation }) {
             value={textInput}
           />
           <TouchableOpacity onPress={() => handleTextInput()}>
-            <Feather name="arrow-right-circle" size={30} color="black" style={{ paddingTop: 0 }} />
+            <Feather name="arrow-right-circle" size={40} color="black" style={{ marginTop: -3 }} />
           </TouchableOpacity>
         </View>
 
@@ -440,12 +440,13 @@ const styles = StyleSheet.create({
   textBoxContainer: {
     backgroundColor: 'white',
     width: '100%',
-    height: 40,
+    height: 50,
     borderRadius: 50,
     padding: 4,
     paddingLeft: 10,
     marginBottom: 4,
     flexDirection: 'row',
+    alignItems: 'center',
   },
   listContainer: {
     width: '100%',

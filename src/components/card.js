@@ -2,12 +2,25 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome5';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 // Components
 
 export default function Card(props) {
   return (
-    <View style={styles.card}>
+    <TouchableWithoutFeedback
+      onPress={() =>
+        props.navigation.navigate('Detail', {
+          data: {
+            time: props.time,
+            itemsAmount: props.itemsCount,
+            date: props.date,
+            items: props.itemsCount,
+          },
+        })
+      }
+      style={styles.card}
+    >
       <View>
         <Text style={styles.title}>{props.date},</Text>
         <Text style={styles.title}>{props.city}</Text>
@@ -29,7 +42,7 @@ export default function Card(props) {
           <Text style={styles.widgetText}>{props.time}</Text>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -39,7 +52,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     width: '94%',
     height: 112,
-    marginTop: 14,
+    marginBottom: 12,
+    marginTop: 8,
     borderRadius: 24,
     alignSelf: 'center',
     padding: 14,

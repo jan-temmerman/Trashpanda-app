@@ -104,8 +104,9 @@ export default function MyRecordings({ navigation }) {
       />
     {itemsListRendered} */}
       <FlatList
-        style={{ width: '100%', borderTopLeftRadius: 30, borderTopRightRadius: 30 }}
+        style={{ width: '100%', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingTop: 6 }}
         contentContainerStyle={{ paddingBottom: 300 }}
+        showsVerticalScrollIndicator={false}
         data={[
           {
             title: 'card 1',
@@ -192,7 +193,8 @@ export default function MyRecordings({ navigation }) {
         ListEmptyComponent={<EmptyListPlaceholder />}
         renderItem={({ item }) => (
           <Card
-            àtitle={item.title}
+            navigation={navigation}
+            title={item.title}
             distance={item.distance}
             time={item.time}
             itemsCount={item.itemsPickedUp}
@@ -202,7 +204,7 @@ export default function MyRecordings({ navigation }) {
         )}
       />
       <TouchableHighlight onPress={() => navigation.navigate('AddRecording')} style={styles.addButton}>
-        <Ionicons name="ios-add" size={50} color="#ffb800" />
+        <Ionicons name="ios-add" size={50} color="#FFFFFF" />
       </TouchableHighlight>
     </Layout>
   );

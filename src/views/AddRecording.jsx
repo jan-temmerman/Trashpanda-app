@@ -15,7 +15,7 @@ export default function AddRecording({ navigation }) {
       <View style={{ flex: 1, justifyContent: 'space-between', marginBottom: 110 }}>
         <Carousel
           width={Math.round(Dimensions.get('window').width)}
-          height={330}
+          height={370}
           animate={false}
           indicatorAtBottom
           indicatorSize={12}
@@ -25,25 +25,30 @@ export default function AddRecording({ navigation }) {
             <View style={{ width: '75%', marginBottom: 10 }}>
               <Heading text="Adding items using your microphone." textAlign="left" />
             </View>
-            <View style={{ width: '75%', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <View style={{ alignItems: 'flex-end', marginRight: 4 }}>
-                <Text style={{ fontSize: 38, marginTop: -16, fontFamily: 'Montserrat-Bold' }}>1</Text>
-                <Text style={{ fontSize: 38, marginBottom: 18, fontFamily: 'Montserrat-Bold' }}>2</Text>
-                <Text style={{ fontSize: 38, marginBottom: 14, fontFamily: 'Montserrat-Bold' }}>3</Text>
-              </View>
-              <View style={{ width: '90%' }}>
+            <View style={styles.paragraphContainer}>
+              <View style={styles.paragraph}>
+                <Text style={styles.number}>1</Text>
                 <Paragraph
                   text={"Start every entry by saying 'start', the microphone will then start listening."}
                   textAlign="left"
                 />
+              </View>
+              <View style={styles.paragraph}>
+                <Text style={styles.number}>2</Text>
                 <Paragraph
                   text="Then say the quantity and the name of the product you picked up. Snap a photo by adding the word ‘photo’ at the end."
                   textAlign="left"
                 />
+              </View>
+              <View style={styles.paragraph}>
+                <Text style={styles.number}>3</Text>
                 <Paragraph
                   text={"Start every entry by saying 'start', the microphone will then start listening."}
                   textAlign="left"
                 />
+              </View>
+              <View style={styles.paragraph}>
+                <Text style={styles.number}></Text>
                 <Paragraph text="Repeat this for every group of products you find." textAlign="left" />
               </View>
             </View>
@@ -51,30 +56,26 @@ export default function AddRecording({ navigation }) {
 
           <View style={{ marginTop: 28, alignItems: 'center' }}>
             <View style={{ width: '75%', marginBottom: 10 }}>
-              <Heading text={'Adding items using the \n keyboard.'} textAlign="left" />
+              <Heading text={'Adding items using the \nkeyboard.'} textAlign="left" />
             </View>
-            <View style={{ width: '75%', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <View style={{ alignItems: 'flex-end', marginRight: 4 }}>
-                <Text
-                  style={{
-                    fontSize: 38,
-                    marginTop: -16,
-                    marginBottom: 30,
-                    fontFamily: 'Montserrat-Bold',
-                  }}
-                >
-                  1
-                </Text>
-                <Text style={{ fontSize: 38, marginBottom: 2, fontFamily: 'Montserrat-Bold' }}>2</Text>
-                <Text style={{ fontSize: 38, marginBottom: 14, fontFamily: 'Montserrat-Bold' }}>3</Text>
-              </View>
-              <View style={{ width: '90%' }}>
+            <View style={styles.paragraphContainer}>
+              <View style={styles.paragraph}>
+                <Text style={styles.number}>1</Text>
                 <Paragraph
                   text="Type the name of the product you picked up. You can also tap one of the suggestions of products that are most found."
                   textAlign="left"
                 />
+              </View>
+              <View style={styles.paragraph}>
+                <Text style={styles.number}>2</Text>
                 <Paragraph text="Fill in the amount of items you found of this product." textAlign="left" />
+              </View>
+              <View style={styles.paragraph}>
+                <Text style={styles.number}>3</Text>
                 <Paragraph text="Tap the camera icon of you want to add a photo to the entry." textAlign="left" />
+              </View>
+              <View style={styles.paragraph}>
+                <Text style={styles.number}></Text>
                 <Paragraph text="Repeat this for every group of products you find." textAlign="left" />
               </View>
             </View>
@@ -121,5 +122,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingTop: 2,
+  },
+  paragraphContainer: {
+    width: '70%',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: -30,
+  },
+  paragraph: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  number: {
+    fontSize: 38,
+    marginTop: -16,
+    fontFamily: 'Montserrat-Bold',
+    marginRight: 8,
+    width: 24,
+    textAlign: 'right',
   },
 });
