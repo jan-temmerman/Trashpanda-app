@@ -11,8 +11,9 @@ export default function SignUp({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatedPassword, setRepeatedPassword] = useState('');
-  const [error, setError] = useState('');
   const [isBusy, setIsBusy] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState();
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState();
 
   const signUp = () => {
     setIsBusy(true);
@@ -26,13 +27,43 @@ export default function SignUp({ navigation }) {
         })
         .catch(function (error) {
           setIsBusy(false);
+          checkErrors(error.code);
           var errorCode = error.code;
           var errorMessage = error.message;
           console.log(errorCode, errorMessage);
         });
     else {
-      setError("Passwords don't match.");
+      checkErrors('auth/passwords-dont-match');
       setIsBusy(false);
+    }
+  };
+
+  const checkErrors = (error) => {
+    switch (error) {
+      case 'auth/invalid-email':
+        setEmailErrorMessage(<Text style={styles.error}>Badly formatted email address</Text>);
+        setPasswordErrorMessage();
+        break;
+      case 'auth/email-already-in-use':
+        setEmailErrorMessage(<Text style={styles.error}>Email is already in use</Text>);
+        setPasswordErrorMessage();
+        break;
+      case 'auth/passwords-dont-match':
+        setPasswordErrorMessage(<Text style={styles.error}>Passwords don&apos;t match</Text>);
+        setEmailErrorMessage();
+        break;
+      case 'auth/weak-password':
+        setPasswordErrorMessage(<Text style={styles.error}>Password must be 6 characters long</Text>);
+        setEmailErrorMessage();
+        break;
+      case '':
+        setEmailErrorMessage();
+        setPasswordErrorMessage();
+        break;
+      default:
+        setEmailErrorMessage(<Text style={styles.error}>Something went wrong</Text>);
+        setPasswordErrorMessage();
+        break;
     }
   };
 
@@ -46,7 +77,10 @@ export default function SignUp({ navigation }) {
       <Image style={styles.image} source={require('../assets/images/profile.png')} resizeMode={'contain'} />
 
       <View style={{ marginTop: 30 }}>
-        <Text style={styles.label}>Email</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.label}>Email</Text>
+          {emailErrorMessage}
+        </View>
         <View style={styles.textBoxContainer}>
           <TextInput
             placeholder="Example@gmail.com"
@@ -65,7 +99,10 @@ export default function SignUp({ navigation }) {
       </View>
 
       <View style={{ marginBottom: 0 }}>
-        <Text style={styles.label}>Password</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.label}>Password</Text>
+          {passwordErrorMessage}
+        </View>
         <View style={styles.textBoxContainer}>
           <TextInput
             placeholder="Password"
@@ -203,5 +240,16 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: -30,
     resizeMode: 'contain',
+  },
+  error: {
+    backgroundColor: 'red',
+    color: 'white',
+    borderRadius: 100,
+    padding: 1,
+    paddingLeft: 6,
+    paddingRight: 6,
+    marginLeft: 4,
+    fontSize: 14,
+    fontFamily: 'Montserrat-regular',
   },
 });

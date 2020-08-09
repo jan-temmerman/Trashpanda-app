@@ -1,28 +1,28 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View, Dimensions, TextInput } from 'react-native';
-import Voice from '@react-native-community/voice';
+import { Button, StyleSheet, Text, View, Dimensions, TextInput, Alert, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import auth from '@react-native-firebase/auth';
 
 // Components
-import EmptyListPlaceholder from '../components/emptyListPlaceholder';
 import Layout from '../components/layout';
 import Heading from '../components/text/heading';
 import Paragraph from '../components/text/paragraph';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function Profile({ navigation }) {
-  const [itemsList, setItemsList] = useState([]);
-  const [itemsListRendered, setItemsListRendered] = useState();
+  const [isBusy, setIsBusy] = useState(false);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState();
+  const [usernameErrorMessage, setUserNameErrorMessage] = useState();
 
   const windowWidth = Dimensions.get('window').width;
   const photoWidth = windowWidth * 0.25;
 
   useEffect(() => {
+    checkErrors('');
     if (auth().currentUser) setUserLoggedIn(true);
     else setUserLoggedIn(false);
 
@@ -30,16 +30,21 @@ export default function Profile({ navigation }) {
       if (user) {
         setUserLoggedIn(true);
         console.log(user);
-        if (user.displayName) setUsername(user.displayName);
-        else setUsername('');
-        setEmail(user.email);
+        fillInFields(user);
       } else setUserLoggedIn(false);
     });
 
     return;
   }, []);
 
+  const fillInFields = (user) => {
+    if (user.displayName) setUsername(user.displayName);
+    else setUsername('');
+    setEmail(user.email);
+  };
+
   const updateProfile = () => {
+    setIsBusy(true);
     var user = auth().currentUser;
 
     user
@@ -48,18 +53,28 @@ export default function Profile({ navigation }) {
         photoURL: null,
       })
       .then(function (e) {
+        setIsBusy(false);
         console.log(e);
+        checkErrors('');
       })
       .catch(function (error) {
+        setIsBusy(false);
+        fillInFields(user);
+        checkErrors(error.code);
         console.log(error);
       });
 
     user
       .updateEmail(email)
       .then(function (e) {
+        setIsBusy(false);
         console.log(e);
+        checkErrors('');
       })
       .catch(function (error) {
+        setIsBusy(false);
+        fillInFields(user);
+        checkErrors(error.code);
         console.log(error);
       });
   };
@@ -75,6 +90,49 @@ export default function Profile({ navigation }) {
       });
   };
 
+  const checkErrors = (error) => {
+    console.log(error);
+    switch (error) {
+      case 'auth/invalid-email':
+        setEmailErrorMessage(<Text style={styles.error}>Badly formatted email address</Text>);
+        setUserNameErrorMessage();
+        break;
+      case 'auth/email-already-in-use':
+        setEmailErrorMessage(<Text style={styles.error}>Email is already in use</Text>);
+        setUserNameErrorMessage();
+        break;
+      case 'auth/requires-recent-login':
+        setEmailErrorMessage();
+        setUserNameErrorMessage();
+        Alert.alert(
+          'Update profile',
+          'To update your profile you need to be logged in recently. Please log out and sign in again.',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            { text: 'Log out', onPress: () => signOut() },
+          ],
+          { cancelable: false },
+        );
+        break;
+      case '':
+        setEmailErrorMessage();
+        setUserNameErrorMessage();
+        break;
+      default:
+        setUserNameErrorMessage(<Text style={styles.error}>Something went wrong</Text>);
+        setEmailErrorMessage();
+        break;
+    }
+  };
+
+  const renderButtonContent = () => {
+    if (isBusy) return <ActivityIndicator size="small" color="#FFFFFF" />;
+    else return <Text style={styles.mainButtonText}>Update</Text>;
+  };
+
   if (userLoggedIn)
     return (
       <Layout headerTitle="Profile">
@@ -83,7 +141,10 @@ export default function Profile({ navigation }) {
         </TouchableOpacity>
 
         <View style={{ marginTop: 30 }}>
-          <Text style={styles.label}>Username</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.label}>Username</Text>
+            {usernameErrorMessage}
+          </View>
           <View style={styles.textBoxContainer}>
             <TextInput
               placeholder="E.g. Peter Parker"
@@ -99,7 +160,10 @@ export default function Profile({ navigation }) {
         </View>
 
         <View style={{ marginBottom: 14 }}>
-          <Text style={styles.label}>Email</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.label}>Email</Text>
+            {emailErrorMessage}
+          </View>
           <View style={styles.textBoxContainer}>
             <TextInput
               placeholder="E.g. peterparker@gmail.com"
@@ -117,7 +181,7 @@ export default function Profile({ navigation }) {
         </View>
 
         <TouchableOpacity style={styles.mainButton} onPress={() => updateProfile()}>
-          <Text style={styles.mainButtonText}>Update</Text>
+          {renderButtonContent()}
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.secundaryButton} onPress={() => signOut()}>
@@ -241,5 +305,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 30,
+  },
+  error: {
+    backgroundColor: 'red',
+    color: 'white',
+    borderRadius: 100,
+    padding: 1,
+    paddingLeft: 6,
+    paddingRight: 6,
+    marginLeft: 4,
+    fontSize: 14,
+    fontFamily: 'Montserrat-regular',
   },
 });

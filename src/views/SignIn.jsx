@@ -14,6 +14,8 @@ export default function SignIn({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isBusy, setIsBusy] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState();
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState();
 
   const signIn = () => {
     setIsBusy(true);
@@ -26,10 +28,36 @@ export default function SignIn({ navigation }) {
       })
       .catch(function (error) {
         setIsBusy(false);
+        checkErrors(error);
         var errorCode = error.code;
         var errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        console.log(errorCode);
       });
+  };
+
+  const checkErrors = (error) => {
+    switch (error.code) {
+      case 'auth/invalid-email':
+        setEmailErrorMessage(<Text style={styles.error}>Badly formatted email address</Text>);
+        setPasswordErrorMessage();
+        break;
+      case 'auth/wrong-password':
+        setPasswordErrorMessage(<Text style={styles.error}>Wrong password</Text>);
+        setEmailErrorMessage();
+        break;
+      case 'auth/user-not-found':
+        setEmailErrorMessage(<Text style={styles.error}>No account linked to this email</Text>);
+        setPasswordErrorMessage();
+        break;
+      case '':
+        setEmailErrorMessage();
+        setPasswordErrorMessage();
+        break;
+      default:
+        setEmailErrorMessage(<Text style={styles.error}>Something went wrong</Text>);
+        setPasswordErrorMessage();
+        break;
+    }
   };
 
   const renderButtonContent = () => {
@@ -42,7 +70,10 @@ export default function SignIn({ navigation }) {
       <Image style={styles.image} source={require('../assets/images/login.png')} resizeMode={'contain'} />
 
       <View style={{ marginTop: 30 }}>
-        <Text style={styles.label}>Email</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.label}>Email</Text>
+          {emailErrorMessage}
+        </View>
         <View style={styles.textBoxContainer}>
           <TextInput
             placeholder="Example@gmail.com"
@@ -61,7 +92,10 @@ export default function SignIn({ navigation }) {
       </View>
 
       <View style={{ marginBottom: 0 }}>
-        <Text style={styles.label}>Password</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.label}>Password</Text>
+          {passwordErrorMessage}
+        </View>
         <View style={styles.textBoxContainer}>
           <TextInput
             placeholder="Password"
@@ -181,5 +215,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: -30,
     resizeMode: 'contain',
+  },
+  error: {
+    color: 'red',
+    fontSize: 14,
+    fontFamily: 'Montserrat-regular',
+  },
+  error: {
+    backgroundColor: 'red',
+    color: 'white',
+    borderRadius: 100,
+    padding: 1,
+    paddingLeft: 6,
+    paddingRight: 6,
+    marginLeft: 4,
+    fontSize: 14,
+    fontFamily: 'Montserrat-regular',
   },
 });
