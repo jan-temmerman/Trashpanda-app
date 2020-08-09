@@ -1,8 +1,24 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View, Dimensions, TextInput, Alert, ActivityIndicator } from 'react-native';
+import {
+  Button,
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+  Platform,
+  Linking,
+  Image,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
+import ImagePicker from 'react-native-image-crop-picker';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import OptionsMenu from 'react-native-options-menu';
 
 // Components
 import Layout from '../components/layout';
@@ -14,6 +30,7 @@ export default function Profile({ navigation }) {
   const [isBusy, setIsBusy] = useState(false);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [profilePicture, setProfilePicture] = useState('');
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState();
   const [usernameErrorMessage, setUserNameErrorMessage] = useState();
@@ -50,7 +67,6 @@ export default function Profile({ navigation }) {
     user
       .updateProfile({
         displayName: username,
-        photoURL: null,
       })
       .then(function (e) {
         setIsBusy(false);
@@ -128,17 +144,124 @@ export default function Profile({ navigation }) {
     }
   };
 
+  const openImagePicker = () => {
+    check(PERMISSIONS.IOS.PHOTO_LIBRARY)
+      .then((result) => {
+        if (result === RESULTS.GRANTED) {
+          ImagePicker.openPicker({
+            multiple: false,
+            mediaType: 'photo',
+            cropping: true,
+            compressImageQuality: 0.1,
+          })
+            .then((photo) => {
+              console.log(photo);
+              uploadImage(photo);
+              setProfilePicture(photo);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        } else if (result === RESULTS.DENIED) {
+          request(
+            Platform.select({
+              android: PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+              ios: PERMISSIONS.IOS.PHOTO_LIBRARY,
+            }),
+          ).then(() => openImagePicker());
+        } else
+          return Alert.alert(
+            'Permission to photo gallery denied',
+            'Permit access to the photo gallery',
+            [
+              {
+                text: 'Cancel',
+                style: 'cancel',
+              },
+              { text: 'Settings', onPress: () => Linking.openURL('app-settings:') },
+            ],
+            { cancelable: false },
+          );
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const getRefFromUrl = (url) => {
+    return url
+      .slice('https://firebasestorage.googleapis.com/v0/b/trashpanda-c9ff3.appspot.com/o/'.length, url.indexOf('?alt'))
+      .replace(/%2F/g, '/');
+  };
+
+  const deleteCurrentImage = () => {
+    const user = auth().currentUser;
+    storage()
+      .ref(getRefFromUrl(user.photoURL))
+      .delete()
+      .catch((error) => console.log(error));
+  };
+
+  const uploadImage = (photo) => {
+    const user = auth().currentUser;
+
+    storage()
+      .ref(`users/${user.uid}/${photo.filename}`)
+      .putFile(photo.path)
+      .then((value) => {
+        console.log(value);
+        storage()
+          .ref(`users/${user.uid}/${photo.filename}`)
+          .getDownloadURL()
+          .then((url) => {
+            deleteCurrentImage();
+
+            user
+              .updateProfile({
+                photoURL: url,
+              })
+              .then((e) => {
+                console.log(e);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          });
+      })
+      .catch((error) => console.log(error));
+  };
+
   const renderButtonContent = () => {
     if (isBusy) return <ActivityIndicator size="small" color="#FFFFFF" />;
     else return <Text style={styles.mainButtonText}>Update</Text>;
   };
 
+  const renderProfileImage = () => {
+    const user = auth().currentUser;
+
+    if (user.photoURL)
+      return (
+        <OptionsMenu
+          customButton={
+            <View style={styles.profileImageContainer}>
+              <Image style={styles.profileImage} resizeMode="contain" source={{ uri: user.photoURL }} />
+            </View>
+          }
+          destructiveIndex={-1}
+          options={['Choose new image', 'Delete current image', 'Cancel']}
+          actions={[() => openImagePicker(), () => deleteProfileImage(), null]}
+        />
+      );
+    else
+      return (
+        <TouchableOpacity style={styles.profileImage} onPress={() => openImagePicker()}>
+          <Ionicons style={styles.profilePlaceholder} name={'md-person'} size={photoWidth} color={'black'} />
+        </TouchableOpacity>
+      );
+  };
+
   if (userLoggedIn)
     return (
       <Layout headerTitle="Profile">
-        <TouchableOpacity style={styles.profileImage}>
-          <Ionicons name={'md-person'} size={photoWidth} color={'black'} />
-        </TouchableOpacity>
+        {renderProfileImage()}
 
         <View style={{ marginTop: 30 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -246,9 +369,8 @@ const styles = StyleSheet.create({
     paddingLeft: 14,
     fontFamily: 'Montserrat-Semibold',
   },
-  profileImage: {
+  profileImageContainer: {
     marginTop: 30,
-    paddingTop: photoWidth * 0.1,
     alignItems: 'center',
     overflow: 'hidden',
     width: photoWidth,
@@ -316,5 +438,12 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontSize: 14,
     fontFamily: 'Montserrat-regular',
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+  },
+  profilePlaceholder: {
+    paddingTop: photoWidth * 0.1,
   },
 });
