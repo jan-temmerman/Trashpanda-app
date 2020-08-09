@@ -2,6 +2,7 @@ import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View, Dimensions, TextInput, Image, ActivityIndicator } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 // Components
 import Layout from '../components/layout';
@@ -74,73 +75,80 @@ export default function SignUp({ navigation }) {
 
   return (
     <Layout headerTitle="Sign Up" navigationObject={navigation} backButtonVisible>
-      <Image style={styles.image} source={require('../assets/images/profile.png')} resizeMode={'contain'} />
+      <KeyboardAwareScrollView
+        style={{ width: '100%' }}
+        contentContainerStyle={{ alignItems: 'center' }}
+        extraScrollHeight={40}
+      >
+        <Image style={styles.image} source={require('../assets/images/profile.png')} resizeMode={'contain'} />
 
-      <View style={{ marginTop: 30 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.label}>Email</Text>
-          {emailErrorMessage}
+        <View style={{ marginTop: 30 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.label}>Email</Text>
+            {emailErrorMessage}
+          </View>
+          <View style={styles.textBoxContainer}>
+            <TextInput
+              placeholder="Example@gmail.com"
+              returnKeyType="done"
+              clearButtonMode="while-editing"
+              placeholderTextColor="lightgray"
+              selectionColor="black"
+              keyboardType="email-address"
+              textContentType="emailAddress"
+              autoCapitalize="none"
+              style={styles.textInput}
+              onChangeText={(text) => setEmail(text)}
+              value={email}
+            />
+          </View>
         </View>
-        <View style={styles.textBoxContainer}>
-          <TextInput
-            placeholder="Example@gmail.com"
-            returnKeyType="done"
-            clearButtonMode="while-editing"
-            placeholderTextColor="lightgray"
-            selectionColor="black"
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            autoCapitalize="none"
-            style={styles.textInput}
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-          />
-        </View>
-      </View>
 
-      <View style={{ marginBottom: 0 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.label}>Password</Text>
-          {passwordErrorMessage}
+        <View style={{ marginBottom: 0 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.label}>Password</Text>
+            {passwordErrorMessage}
+          </View>
+          <View style={styles.textBoxContainer}>
+            <TextInput
+              placeholder="Password"
+              returnKeyType="done"
+              clearButtonMode="while-editing"
+              placeholderTextColor="lightgray"
+              selectionColor="black"
+              keyboardType="default"
+              secureTextEntry={true}
+              textContentType="password"
+              style={styles.textInput}
+              onChangeText={(text) => setPassword(text)}
+              value={password}
+            />
+          </View>
         </View>
-        <View style={styles.textBoxContainer}>
-          <TextInput
-            placeholder="Password"
-            returnKeyType="done"
-            clearButtonMode="while-editing"
-            placeholderTextColor="lightgray"
-            selectionColor="black"
-            keyboardType="default"
-            secureTextEntry={true}
-            style={styles.textInput}
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-          />
-        </View>
-      </View>
 
-      <View style={{ marginBottom: 14 }}>
-        <Text style={styles.label}>Repeat Password</Text>
-        <View style={styles.textBoxContainer}>
-          <TextInput
-            placeholder="Password"
-            returnKeyType="done"
-            clearButtonMode="while-editing"
-            placeholderTextColor="lightgray"
-            selectionColor="black"
-            keyboardType="default"
-            textContentType="password"
-            secureTextEntry={true}
-            style={styles.textInput}
-            onChangeText={(text) => setRepeatedPassword(text)}
-            value={repeatedPassword}
-          />
+        <View style={{ marginBottom: 14 }}>
+          <Text style={styles.label}>Repeat Password</Text>
+          <View style={styles.textBoxContainer}>
+            <TextInput
+              placeholder="Password"
+              returnKeyType="done"
+              clearButtonMode="while-editing"
+              placeholderTextColor="lightgray"
+              selectionColor="black"
+              keyboardType="default"
+              textContentType="password"
+              secureTextEntry={true}
+              style={styles.textInput}
+              onChangeText={(text) => setRepeatedPassword(text)}
+              value={repeatedPassword}
+            />
+          </View>
         </View>
-      </View>
 
-      <TouchableOpacity style={styles.mainButton} onPress={() => signUp()}>
-        {renderButtonContent()}
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.mainButton} onPress={() => signUp()}>
+          {renderButtonContent()}
+        </TouchableOpacity>
+      </KeyboardAwareScrollView>
     </Layout>
   );
 }

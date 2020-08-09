@@ -19,6 +19,7 @@ import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import OptionsMenu from 'react-native-options-menu';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 // Components
 import Layout from '../components/layout';
@@ -41,10 +42,10 @@ export default function Profile({ navigation }) {
 
   useEffect(() => {
     checkErrors('');
-    if (auth().currentUser) setUserLoggedIn(true);
-    else setUserLoggedIn(false);
-
-    setProfileImage(auth().currentUser.photoURL);
+    if (auth().currentUser) {
+      setProfileImage(auth().currentUser.photoURL);
+      setUserLoggedIn(true);
+    } else setUserLoggedIn(false);
 
     auth().onAuthStateChanged((user) => {
       if (user) {
@@ -276,55 +277,61 @@ export default function Profile({ navigation }) {
   if (userLoggedIn)
     return (
       <Layout headerTitle="Profile">
-        {renderProfileImage()}
+        <KeyboardAwareScrollView
+          style={{ width: '100%' }}
+          contentContainerStyle={{ alignItems: 'center' }}
+          extraScrollHeight={40}
+        >
+          {renderProfileImage()}
 
-        <View style={{ marginTop: 30 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={styles.label}>Username</Text>
-            {usernameErrorMessage}
+          <View style={{ marginTop: 30 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={styles.label}>Username</Text>
+              {usernameErrorMessage}
+            </View>
+            <View style={styles.textBoxContainer}>
+              <TextInput
+                placeholder="E.g. Peter Parker"
+                returnKeyType="done"
+                clearButtonMode="while-editing"
+                placeholderTextColor="lightgray"
+                selectionColor="black"
+                style={styles.textInput}
+                onChangeText={(text) => setUsername(text)}
+                value={username}
+              />
+            </View>
           </View>
-          <View style={styles.textBoxContainer}>
-            <TextInput
-              placeholder="E.g. Peter Parker"
-              returnKeyType="done"
-              clearButtonMode="while-editing"
-              placeholderTextColor="lightgray"
-              selectionColor="black"
-              style={styles.textInput}
-              onChangeText={(text) => setUsername(text)}
-              value={username}
-            />
-          </View>
-        </View>
 
-        <View style={{ marginBottom: 14 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={styles.label}>Email</Text>
-            {emailErrorMessage}
+          <View style={{ marginBottom: 14 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={styles.label}>Email</Text>
+              {emailErrorMessage}
+            </View>
+            <View style={styles.textBoxContainer}>
+              <TextInput
+                placeholder="E.g. peterparker@gmail.com"
+                returnKeyType="done"
+                clearButtonMode="while-editing"
+                placeholderTextColor="lightgray"
+                selectionColor="black"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                style={styles.textInput}
+                onChangeText={(text) => setEmail(text)}
+                value={email}
+              />
+            </View>
           </View>
-          <View style={styles.textBoxContainer}>
-            <TextInput
-              placeholder="E.g. peterparker@gmail.com"
-              returnKeyType="done"
-              clearButtonMode="while-editing"
-              placeholderTextColor="lightgray"
-              selectionColor="black"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              style={styles.textInput}
-              onChangeText={(text) => setEmail(text)}
-              value={email}
-            />
-          </View>
-        </View>
 
-        <TouchableOpacity style={styles.mainButton} onPress={() => updateProfile()}>
-          {renderButtonContent()}
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.mainButton} onPress={() => updateProfile()}>
+            {renderButtonContent()}
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.secundaryButton} onPress={() => signOut()}>
-          <Text style={styles.secundaryButtonText}>Logout</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.secundaryButton} onPress={() => signOut()}>
+            <Text style={styles.secundaryButtonText}>Logout</Text>
+          </TouchableOpacity>
+        </KeyboardAwareScrollView>
       </Layout>
     );
   else

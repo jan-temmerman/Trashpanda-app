@@ -4,6 +4,7 @@ import { Button, StyleSheet, Text, View, Dimensions, TextInput, Image, ActivityI
 import Voice from '@react-native-community/voice';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import auth from '@react-native-firebase/auth';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 // Components
 import EmptyListPlaceholder from '../components/emptyListPlaceholder';
@@ -67,55 +68,61 @@ export default function SignIn({ navigation }) {
 
   return (
     <Layout headerTitle="Sign In" navigationObject={navigation} backButtonVisible>
-      <Image style={styles.image} source={require('../assets/images/login.png')} resizeMode={'contain'} />
+      <KeyboardAwareScrollView
+        style={{ width: '100%' }}
+        contentContainerStyle={{ alignItems: 'center' }}
+        extraScrollHeight={40}
+      >
+        <Image style={styles.image} source={require('../assets/images/login.png')} resizeMode={'contain'} />
 
-      <View style={{ marginTop: 30 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.label}>Email</Text>
-          {emailErrorMessage}
+        <View style={{ marginTop: 30 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.label}>Email</Text>
+            {emailErrorMessage}
+          </View>
+          <View style={styles.textBoxContainer}>
+            <TextInput
+              placeholder="Example@gmail.com"
+              returnKeyType="done"
+              clearButtonMode="while-editing"
+              placeholderTextColor="lightgray"
+              selectionColor="black"
+              keyboardType="email-address"
+              textContentType="emailAddress"
+              autoCapitalize="none"
+              style={styles.textInput}
+              onChangeText={(text) => setEmail(text)}
+              value={email}
+            />
+          </View>
         </View>
-        <View style={styles.textBoxContainer}>
-          <TextInput
-            placeholder="Example@gmail.com"
-            returnKeyType="done"
-            clearButtonMode="while-editing"
-            placeholderTextColor="lightgray"
-            selectionColor="black"
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            autoCapitalize="none"
-            style={styles.textInput}
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-          />
-        </View>
-      </View>
 
-      <View style={{ marginBottom: 0 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.label}>Password</Text>
-          {passwordErrorMessage}
+        <View style={{ marginBottom: 0 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.label}>Password</Text>
+            {passwordErrorMessage}
+          </View>
+          <View style={styles.textBoxContainer}>
+            <TextInput
+              placeholder="Password"
+              returnKeyType="done"
+              clearButtonMode="while-editing"
+              placeholderTextColor="lightgray"
+              selectionColor="black"
+              keyboardType="default"
+              textContentType="password"
+              secureTextEntry={true}
+              style={styles.textInput}
+              onChangeText={(text) => setPassword(text)}
+              value={password}
+            />
+          </View>
         </View>
-        <View style={styles.textBoxContainer}>
-          <TextInput
-            placeholder="Password"
-            returnKeyType="done"
-            clearButtonMode="while-editing"
-            placeholderTextColor="lightgray"
-            selectionColor="black"
-            keyboardType="default"
-            textContentType="password"
-            secureTextEntry={true}
-            style={styles.textInput}
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-          />
-        </View>
-      </View>
 
-      <TouchableOpacity style={styles.mainButton} onPress={() => signIn()}>
-        {renderButtonContent()}
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.mainButton} onPress={() => signIn()}>
+          {renderButtonContent()}
+        </TouchableOpacity>
+      </KeyboardAwareScrollView>
     </Layout>
   );
 }
