@@ -28,7 +28,7 @@
     "node-emoji": "^1.10.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-native": "^0.62.2",
+    "react-native": "^0.62.0",
     "react-native-camera": "^3.23.1",
     "react-native-carousel-view": "^0.5.1",
     "react-native-dash": "0.0.11",

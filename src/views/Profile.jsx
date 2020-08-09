@@ -28,9 +28,10 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function Profile({ navigation }) {
   const [isBusy, setIsBusy] = useState(false);
+  const [user, setUser] = useState(auth().currentUser);
+  const [profileImage, setProfileImage] = useState(null);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [profilePicture, setProfilePicture] = useState('');
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState();
   const [usernameErrorMessage, setUserNameErrorMessage] = useState();
@@ -43,11 +44,15 @@ export default function Profile({ navigation }) {
     if (auth().currentUser) setUserLoggedIn(true);
     else setUserLoggedIn(false);
 
+    setProfileImage(auth().currentUser.photoURL);
+
     auth().onAuthStateChanged((user) => {
       if (user) {
         setUserLoggedIn(true);
         console.log(user);
         fillInFields(user);
+        setProfileImage(user.photoURL);
+        console.log(user.photoURL);
       } else setUserLoggedIn(false);
     });
 
@@ -62,7 +67,6 @@ export default function Profile({ navigation }) {
 
   const updateProfile = () => {
     setIsBusy(true);
-    var user = auth().currentUser;
 
     user
       .updateProfile({
@@ -193,16 +197,14 @@ export default function Profile({ navigation }) {
   };
 
   const deleteCurrentImage = () => {
-    const user = auth().currentUser;
-    storage()
-      .ref(getRefFromUrl(user.photoURL))
-      .delete()
-      .catch((error) => console.log(error));
+    if (user.photoURL !== null && user.photoURL !== '')
+      storage()
+        .ref(getRefFromUrl(user.photoURL))
+        .delete()
+        .catch((error) => console.log(error));
   };
 
   const uploadImage = (photo) => {
-    const user = auth().currentUser;
-
     storage()
       .ref(`users/${user.uid}/${photo.filename}`)
       .putFile(photo.path)
@@ -213,7 +215,7 @@ export default function Profile({ navigation }) {
           .getDownloadURL()
           .then((url) => {
             deleteCurrentImage();
-
+            setProfileImage(url);
             user
               .updateProfile({
                 photoURL: url,
@@ -229,20 +231,33 @@ export default function Profile({ navigation }) {
       .catch((error) => console.log(error));
   };
 
+  const deleteProfileImage = () => {
+    deleteCurrentImage();
+    user
+      .updateProfile({
+        photoURL: '',
+      })
+      .then((e) => {
+        console.log(e, 'this shouldve deleted the picture');
+        setProfileImage(null);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const renderButtonContent = () => {
     if (isBusy) return <ActivityIndicator size="small" color="#FFFFFF" />;
     else return <Text style={styles.mainButtonText}>Update</Text>;
   };
 
   const renderProfileImage = () => {
-    const user = auth().currentUser;
-
-    if (user.photoURL)
+    if (profileImage !== null && profileImage !== '')
       return (
         <OptionsMenu
           customButton={
             <View style={styles.profileImageContainer}>
-              <Image style={styles.profileImage} resizeMode="contain" source={{ uri: user.photoURL }} />
+              <Image style={styles.profileImage} resizeMode="contain" source={{ uri: profileImage }} />
             </View>
           }
           destructiveIndex={-1}
@@ -252,7 +267,7 @@ export default function Profile({ navigation }) {
       );
     else
       return (
-        <TouchableOpacity style={styles.profileImage} onPress={() => openImagePicker()}>
+        <TouchableOpacity style={styles.profileImageContainer} onPress={() => openImagePicker()}>
           <Ionicons style={styles.profilePlaceholder} name={'md-person'} size={photoWidth} color={'black'} />
         </TouchableOpacity>
       );
