@@ -1,6 +1,16 @@
 import 'react-native-gesture-handler';
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import {
+  Button,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  Modal,
+  SafeAreaView,
+} from 'react-native';
 import Voice from '@react-native-community/voice';
 import { RNCamera } from 'react-native-camera';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -16,42 +26,18 @@ export default function CameraView({ route, navigation }) {
 
   const [imagePath, setimagePath] = useState('');
   const [modal, setModal] = useState(null);
+  const [isBusy, setIsBusy] = useState(false);
+  const [modalIsVisible, setModalIsVisible] = useState(false);
 
   const { itemIndex } = route.params;
 
+  const renderButtonContent = () => {
+    if (isBusy) return <ActivityIndicator size="small" color="#FFFFFF" />;
+    else return <Octicons name="check" size={38} color="#FFF" />;
+  };
+
   useEffect(() => {
-    if (imagePath !== '') {
-      setModal(
-        <View
-          style={{
-            position: 'absolute',
-            flex: 1,
-            width: '100%',
-            height: '100%',
-            zIndex: 20,
-            borderRadius: 30,
-            overflow: 'hidden',
-            justifyContent: 'flex-end',
-          }}
-        >
-          <Image style={{ width: '100%', height: '100%' }} source={{ uri: imagePath }} />
-          <TouchableOpacity
-            onPress={() => setimagePath('')}
-            style={{
-              zIndex: 21,
-              position: 'absolute',
-              top: 10,
-              left: 20,
-            }}
-          >
-            <Octicons name="x" size={38} color="#FFF" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => getImageUrl()} style={styles.accept}>
-            <Octicons name="check" size={38} color="#FFF" />
-          </TouchableOpacity>
-        </View>,
-      );
-    } else setModal(null);
+    if (imagePath !== '') setModalIsVisible(true);
   }, [imagePath]);
 
   const takePicture = async () => {
@@ -64,6 +50,7 @@ export default function CameraView({ route, navigation }) {
   };
 
   const getImageUrl = () => {
+    setIsBusy(true);
     const name = new Date();
     const user = auth().currentUser;
 
@@ -76,41 +63,36 @@ export default function CameraView({ route, navigation }) {
           .getDownloadURL()
           .then((imageUri) => {
             console.log(imageUri);
+            setIsBusy(false);
             navigation.navigate('NewRecording', { itemIndex, imageUri });
           });
       })
       .catch((error) => {
         console.log(error);
+        setIsBusy(false);
       });
   };
 
   return (
     <Layout headerTitle="Camera" navigationObject={navigation} backButtonVisible>
-      {modal}
+      <Modal visible={modalIsVisible} style={styles.modal}>
+        <Image style={{ width: '100%', height: '100%', backgroundColor: 'red' }} source={{ uri: imagePath }} />
+        <TouchableOpacity onPress={() => setModalIsVisible(false)} style={styles.closeModalButton}>
+          <Octicons name="x" size={38} color="#FFF" />
+        </TouchableOpacity>
+        <TouchableOpacity disabled={isBusy} onPress={() => getImageUrl()} style={styles.accept}>
+          {renderButtonContent()}
+        </TouchableOpacity>
+      </Modal>
 
       <RNCamera
         ref={cameraRef}
-        style={{
-          flex: 1,
-          width: '100%',
-          height: '100%',
-          borderRadius: 30,
-          overflow: 'hidden',
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
-        }}
+        style={styles.cameraView}
         captureAudio={false}
         type={RNCamera.Constants.Type.back}
         flashMode={RNCamera.Constants.FlashMode.off}
       >
-        <View
-          style={{
-            flex: 0,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            marginBottom: 60,
-          }}
-        >
+        <View style={styles.captureButtonContainer}>
           <TouchableOpacity onPress={() => takePicture()} style={styles.capture}>
             <View style={styles.innerCapture} />
           </TouchableOpacity>
@@ -156,5 +138,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
+  },
+  closeModalButton: {
+    zIndex: 21,
+    position: 'absolute',
+    top: 40,
+    left: 20,
+  },
+  captureButtonContainer: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 60,
+  },
+  modal: {
+    position: 'absolute',
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    zIndex: 20,
+    borderRadius: 30,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
+  cameraView: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    borderRadius: 30,
+    overflow: 'hidden',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
   },
 });
