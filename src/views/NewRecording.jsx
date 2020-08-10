@@ -9,6 +9,7 @@ import Dash from 'react-native-dash';
 import Geolocation from '@react-native-community/geolocation';
 import Voice from '@react-native-community/voice';
 import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
 
 // Components
 import Layout from '../components/layout';
@@ -318,7 +319,8 @@ export default function NewRecording({ route, navigation }) {
     hours = formatTime(hours);
 
     console.log(`${hours}:${minutes}:${seconds}`);
-    const date = new Date();
+    let date = new Date();
+    //date = Date.parse(date);
 
     calcTotalAmount().then((total) => {
       const data = {
@@ -328,10 +330,16 @@ export default function NewRecording({ route, navigation }) {
         items,
       };
 
-      database()
-        .ref(`/recordings/${date}/`)
-        .set(data)
-        .then(() => navigation.navigate('SummaryView', { data }));
+      if (auth().currentUser)
+        database()
+          .ref(`/recordings/users/${auth().currentUser.uid}/${date}/`)
+          .set(data)
+          .then(() => navigation.navigate('SummaryView', { data }));
+      else
+        database()
+          .ref(`/recordings/anonymous/${date}/`)
+          .set(data)
+          .then(() => navigation.navigate('SummaryView', { data }));
     });
   };
 

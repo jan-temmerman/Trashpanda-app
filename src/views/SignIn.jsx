@@ -23,16 +23,12 @@ export default function SignIn({ navigation }) {
     auth()
       .signInWithEmailAndPassword(email, password)
       .then((e) => {
-        console.log(e);
         setIsBusy(false);
         navigation.navigate('Profile');
       })
       .catch(function (error) {
         setIsBusy(false);
         checkErrors(error);
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log(errorCode);
       });
   };
 

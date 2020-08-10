@@ -3,6 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, FlatList, TouchableHighlight } from 'react-native';
 import Voice from '@react-native-community/voice';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
+import moment from 'moment';
 
 // Components
 import Layout from '../components/layout';
@@ -12,103 +15,44 @@ import EmptyListPlaceholder from '../components/emptyListPlaceholder';
 export default function MyRecordings({ navigation }) {
   const [itemsList, setItemsList] = useState([]);
   const [itemsListRendered, setItemsListRendered] = useState();
-  let currentResult;
-
-  const renderList = () => {
-    console.log(itemsListRendered);
-    const renderedList = itemsList.map((item, key) => {
-      return (
-        <Text style={styles.welcome} key={key}>
-          {item}
-        </Text>
-      );
-    });
-    setItemsListRendered(renderedList);
-  };
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [itemsObject, setItemsObject] = useState({});
 
   useEffect(() => {
-    console.log(currentResult);
-  }, [currentResult]);
+    checkForUser();
 
-  const isStartStopDetected = (spokenTextLowered) => {
-    const startIndex = spokenTextLowered.indexOf('start');
-    const stopIndex = spokenTextLowered.indexOf('stop');
+    auth().onAuthStateChanged(() => {
+      checkForUser();
+    });
+    return;
+  }, []);
 
-    if (startIndex < stopIndex && startIndex !== -1 && stopIndex !== -1) {
-      return true;
-    }
-    return false;
-  };
+  const checkForUser = () => {
+    if (auth().currentUser) {
+      setUserLoggedIn(true);
 
-  const checkResults = (spokenText) => {
-    const spokenTextLowered = spokenText.toLowerCase();
-    console.log(spokenTextLowered);
-
-    if (isStartStopDetected(spokenTextLowered)) {
-      const unfilteresResult = spokenTextLowered;
-      const filteredResult = unfilteresResult.substring(
-        unfilteresResult.lastIndexOf('start') + 6,
-        unfilteresResult.lastIndexOf('stop') - 1,
-      );
-      console.log(filteredResult);
-      currentResult = filteredResult;
-
-      handleMircophone('stop');
-      setTimeout(() => {
-        handleMircophone('start');
-      }, 1000);
-    }
-  };
-
-  const handleEnding = () => {
-    console.log('speech ended');
-    console.log(currentResult);
-    const oldList = itemsList;
-    oldList.push(currentResult);
-    setItemsList(oldList);
-    renderList();
-  };
-
-  const handleMircophone = async (action) => {
-    if (action === 'start') {
-      Voice.onSpeechStart = () => console.log('speech started');
-      Voice.onSpeechEnd = () => handleEnding();
-      Voice.onSpeechResults = (e) => checkResults(e.value[0]);
-
-      try {
-        await Voice.start('en-US');
-      } catch (e) {
-        console.error(e);
-      }
-    } else if (action === 'stop') {
-      try {
-        await Voice.stop();
-        Voice.removeAllListeners();
-      } catch (e) {
-        console.error(e);
-      }
+      database()
+        .ref(`/recordings/users/${auth().currentUser.uid}`)
+        .once('value')
+        .then((snapshot) => {
+          console.log('User logged in, items: ', Object.keys(snapshot.val()));
+          setItemsObject(snapshot.val());
+        });
+    } else {
+      setUserLoggedIn(false);
+      console.log('no user logged in');
     }
   };
 
   return (
     <Layout headerTitle="My Recordings">
-      {/* <Text style={styles.welcome}>Welcome to Trashpanda!!!</Text>
-      <Button
-        onPress={() => handleMircophone('start')}
-        title="start listening"
-      />
-
-      <Button
-        onPress={() => handleMircophone('stop')}
-        title="stop listening"
-      />
-    {itemsListRendered} */}
       <FlatList
         style={{ width: '100%', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingTop: 6 }}
         contentContainerStyle={{ paddingBottom: 300 }}
         showsVerticalScrollIndicator={false}
-        data={[
-          {
+        data={
+          Object.keys(itemsObject)
+          /*[{
             title: 'card 1',
             distance: 3,
             itemsPickedUp: 132,
@@ -189,19 +133,24 @@ export default function MyRecordings({ navigation }) {
             date: 'Sunday 2 april 2020',
             id: 'card9',
           },
-        ]}
+        ]*/
+        }
         ListEmptyComponent={<EmptyListPlaceholder />}
-        renderItem={({ item }) => (
-          <Card
-            navigation={navigation}
-            title={item.title}
-            distance={item.distance}
-            time={item.time}
-            itemsCount={item.itemsPickedUp}
-            date={item.date}
-            city={item.city}
-          />
-        )}
+        keyExtractor={(item, index) => {
+          return item;
+        }}
+        renderItem={({ item, index }) => {
+          return (
+            <Card
+              navigation={navigation}
+              distance={3}
+              time={itemsObject[item].time}
+              itemsCount={itemsObject[item].itemsAmount}
+              date={new Date(item).toLocaleString()}
+              city={'Lokeren'}
+            />
+          );
+        }}
       />
       <TouchableHighlight onPress={() => navigation.navigate('AddRecording')} style={styles.addButton}>
         <Ionicons name="ios-add" size={50} color="#FFFFFF" />

@@ -50,10 +50,8 @@ export default function Profile({ navigation }) {
     auth().onAuthStateChanged((user) => {
       if (user) {
         setUserLoggedIn(true);
-        console.log(user);
         fillInFields(user);
         setProfileImage(user.photoURL);
-        console.log(user.photoURL);
       } else setUserLoggedIn(false);
     });
 
@@ -73,46 +71,38 @@ export default function Profile({ navigation }) {
       .updateProfile({
         displayName: username,
       })
-      .then(function (e) {
+      .then(() => {
         setIsBusy(false);
-        console.log(e);
         checkErrors('');
       })
-      .catch(function (error) {
+      .catch((error) => {
         setIsBusy(false);
         fillInFields(user);
         checkErrors(error.code);
-        console.log(error);
       });
 
     user
       .updateEmail(email)
-      .then(function (e) {
+      .then((e) => {
         setIsBusy(false);
-        console.log(e);
         checkErrors('');
       })
-      .catch(function (error) {
+      .catch((error) => {
         setIsBusy(false);
         fillInFields(user);
         checkErrors(error.code);
-        console.log(error);
       });
   };
 
   const signOut = () => {
     auth()
       .signOut()
-      .then((e) => {
-        console.log(e);
-      })
       .catch((error) => {
         console.log(error);
       });
   };
 
   const checkErrors = (error) => {
-    console.log(error);
     switch (error) {
       case 'auth/invalid-email':
         setEmailErrorMessage(<Text style={styles.error}>Badly formatted email address</Text>);
@@ -160,7 +150,6 @@ export default function Profile({ navigation }) {
             compressImageQuality: 0.1,
           })
             .then((photo) => {
-              console.log(photo);
               uploadImage(photo);
               setProfilePicture(photo);
             })
@@ -210,7 +199,6 @@ export default function Profile({ navigation }) {
       .ref(`users/${user.uid}/${photo.filename}`)
       .putFile(photo.path)
       .then((value) => {
-        console.log(value);
         storage()
           .ref(`users/${user.uid}/${photo.filename}`)
           .getDownloadURL()
@@ -220,9 +208,6 @@ export default function Profile({ navigation }) {
             user
               .updateProfile({
                 photoURL: url,
-              })
-              .then((e) => {
-                console.log(e);
               })
               .catch((error) => {
                 console.log(error);
@@ -239,7 +224,6 @@ export default function Profile({ navigation }) {
         photoURL: '',
       })
       .then((e) => {
-        console.log(e, 'this shouldve deleted the picture');
         setProfileImage(null);
       })
       .catch((error) => {

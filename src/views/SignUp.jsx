@@ -22,16 +22,12 @@ export default function SignUp({ navigation }) {
       auth()
         .createUserWithEmailAndPassword(email, password)
         .then((e) => {
-          console.log(e);
           setIsBusy(false);
           navigation.navigate('Profile');
         })
         .catch(function (error) {
           setIsBusy(false);
           checkErrors(error.code);
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          console.log(errorCode, errorMessage);
         });
     else {
       checkErrors('auth/passwords-dont-match');
