@@ -30,7 +30,6 @@ export default function MyRecordings({ navigation }) {
   const checkForUser = () => {
     if (auth().currentUser) {
       setUserLoggedIn(true);
-
       database()
         .ref(`/recordings/users/${auth().currentUser.uid}`)
         .once('value')
@@ -40,6 +39,7 @@ export default function MyRecordings({ navigation }) {
         });
     } else {
       setUserLoggedIn(false);
+      setItemsObject({});
       console.log('no user logged in');
     }
   };
@@ -50,91 +50,7 @@ export default function MyRecordings({ navigation }) {
         style={{ width: '100%', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingTop: 6 }}
         contentContainerStyle={{ paddingBottom: 300 }}
         showsVerticalScrollIndicator={false}
-        data={
-          Object.keys(itemsObject)
-          /*[{
-            title: 'card 1',
-            distance: 3,
-            itemsPickedUp: 132,
-            time: '00:43',
-            city: 'Ghent',
-            date: 'Monday 7 februari 2020',
-            id: 'card1',
-          },
-          {
-            title: 'card 2',
-            distance: 0.4,
-            itemsPickedUp: 22,
-            time: '00:13',
-            city: 'Ghent',
-            date: 'Friday 21 march 2020',
-            id: 'card2',
-          },
-          {
-            title: 'card 3',
-            distance: 5,
-            itemsPickedUp: 214,
-            time: '01:12',
-            city: 'Ghent',
-            date: 'Sunday 2 april 2020',
-            id: 'card3',
-          },
-          {
-            title: 'card 1',
-            distance: 3,
-            itemsPickedUp: 132,
-            time: '00:43',
-            city: 'Ghent',
-            date: 'Monday 7 februari 2020',
-            id: 'card4',
-          },
-          {
-            title: 'card 2',
-            distance: 0.4,
-            itemsPickedUp: 22,
-            time: '00:13',
-            city: 'Ghent',
-            date: 'Friday 21 march 2020',
-            id: 'card5',
-          },
-          {
-            title: 'card 3',
-            distance: 5,
-            itemsPickedUp: 214,
-            time: '01:12',
-            city: 'Ghent',
-            date: 'Sunday 2 april 2020',
-            id: 'card6',
-          },
-          {
-            title: 'card 1',
-            distance: 3,
-            itemsPickedUp: 132,
-            time: '00:43',
-            city: 'Ghent',
-            date: 'Monday 7 februari 2020',
-            id: 'card7',
-          },
-          {
-            title: 'card 2',
-            distance: 0.4,
-            itemsPickedUp: 22,
-            time: '00:13',
-            city: 'Ghent',
-            date: 'Friday 21 march 2020',
-            id: 'card8',
-          },
-          {
-            title: 'card 3',
-            distance: 5,
-            itemsPickedUp: 214,
-            time: '01:12',
-            city: 'Ghent',
-            date: 'Sunday 2 april 2020',
-            id: 'card9',
-          },
-        ]*/
-        }
+        data={Object.keys(itemsObject).reverse()}
         ListEmptyComponent={<EmptyListPlaceholder />}
         keyExtractor={(item, index) => {
           return item;

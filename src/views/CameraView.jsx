@@ -5,6 +5,8 @@ import Voice from '@react-native-community/voice';
 import { RNCamera } from 'react-native-camera';
 import Octicons from 'react-native-vector-icons/Octicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
 
 // Components
 import Layout from '../components/layout';
@@ -12,13 +14,13 @@ import Layout from '../components/layout';
 export default function CameraView({ route, navigation }) {
   const cameraRef = useRef(null);
 
-  const [imageUri, setImageUri] = useState('');
+  const [imagePath, setimagePath] = useState('');
   const [modal, setModal] = useState(null);
 
   const { itemIndex } = route.params;
 
   useEffect(() => {
-    if (imageUri !== '') {
+    if (imagePath !== '') {
       setModal(
         <View
           style={{
@@ -32,9 +34,9 @@ export default function CameraView({ route, navigation }) {
             justifyContent: 'flex-end',
           }}
         >
-          <Image style={{ width: '100%', height: '100%' }} source={{ uri: imageUri }} />
+          <Image style={{ width: '100%', height: '100%' }} source={{ uri: imagePath }} />
           <TouchableOpacity
-            onPress={() => setImageUri('')}
+            onPress={() => setimagePath('')}
             style={{
               zIndex: 21,
               position: 'absolute',
@@ -44,23 +46,42 @@ export default function CameraView({ route, navigation }) {
           >
             <Octicons name="x" size={38} color="#FFF" />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('NewRecording', { itemIndex, imageUri })}
-            style={styles.accept}
-          >
+          <TouchableOpacity onPress={() => getImageUrl()} style={styles.accept}>
             <Octicons name="check" size={38} color="#FFF" />
           </TouchableOpacity>
         </View>,
       );
     } else setModal(null);
-  }, [imageUri]);
+  }, [imagePath]);
 
   const takePicture = async () => {
     if (cameraRef.current) {
-      const options = { quality: 1, base64: true };
+      const options = { quality: 0.8, base64: false };
       const data = await cameraRef.current.takePictureAsync(options);
-      setImageUri(data.uri);
+      console.log(data);
+      setimagePath(data.uri);
     }
+  };
+
+  const getImageUrl = () => {
+    const name = new Date();
+    const user = auth().currentUser;
+
+    storage()
+      .ref(`users/${user.uid}/recordings/images/${name}`)
+      .putFile(imagePath)
+      .then(() => {
+        storage()
+          .ref(`users/${user.uid}/recordings/images/${name}`)
+          .getDownloadURL()
+          .then((imageUri) => {
+            console.log(imageUri);
+            navigation.navigate('NewRecording', { itemIndex, imageUri });
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (

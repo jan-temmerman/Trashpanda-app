@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -10,6 +10,7 @@ import Geolocation from '@react-native-community/geolocation';
 import Voice from '@react-native-community/voice';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
 
 // Components
 import Layout from '../components/layout';
@@ -31,14 +32,19 @@ export default function NewRecording({ route, navigation }) {
   const [startTime, setStartTime] = useState(new Date().getTime());
 
   useEffect(() => {
+    console.log(imageUri);
     if (itemIndex != null && imageUri !== '') setImageUri(itemIndex, imageUri);
   }, [itemIndex, imageUri]);
 
   useEffect(() => {
+    currentResult = textInput;
+    return;
+  }, [textInput]);
+
+  useEffect(() => {
     if (micIcon) handleMircophone('start');
     else handleMircophone('start');
-    console.log(currentResult);
-  }, [currentResult]);
+  }, []);
 
   const isStartStopDetected = (spokenTextLowered) => {
     const startIndex = spokenTextLowered.indexOf('start');
@@ -50,17 +56,16 @@ export default function NewRecording({ route, navigation }) {
     return false;
   };
 
-  const isSubmitDetected = (spokenTextLowered) => {
+  /*const isSubmitDetected = (spokenTextLowered) => {
     if (spokenTextLowered.indexOf('enter') !== -1) {
-      handleTextInput(textInput);
+      handleTextInput();
     } else return;
-  };
+  };*/
 
   const checkResults = (spokenText) => {
     const spokenTextLowered = spokenText.toLowerCase();
-    console.log(spokenTextLowered);
 
-    isSubmitDetected(spokenTextLowered);
+    //isSubmitDetected(spokenTextLowered);
 
     if (isStartStopDetected(spokenTextLowered)) {
       const unfilteresResult = spokenTextLowered;
@@ -68,11 +73,12 @@ export default function NewRecording({ route, navigation }) {
         unfilteresResult.lastIndexOf('start') + 6,
         unfilteresResult.lastIndexOf('stop') - 1,
       );
-      console.log(filteredResult);
       currentResult = filteredResult;
 
       setTextInput(filteredResult);
-      // handleTextInput(currentResult)
+      /*setTimeout(() => {
+        handleTextInput();
+      }, 1000);*/
 
       handleMircophone('stop');
       setTimeout(() => {
@@ -83,7 +89,6 @@ export default function NewRecording({ route, navigation }) {
 
   const handleEnding = () => {
     console.log('speech ended');
-    console.log(currentResult);
   };
 
   const handleMircophone = async (action) => {
@@ -125,7 +130,6 @@ export default function NewRecording({ route, navigation }) {
     if (action === 'increment') {
       const oldItems = [...items];
       oldItems[index].amount = oldItems[index].amount + 1;
-      console.log(coordinates);
       oldItems[index].geolocations.push(coordinates);
       const updatedItems = oldItems;
 
@@ -144,6 +148,7 @@ export default function NewRecording({ route, navigation }) {
 
   const isAlreadyInList = (text) => {
     for (item of items) {
+      console.log(item.name.toLowerCase(), text.toLowerCase());
       if (item.name.toLowerCase() === text.toLowerCase()) {
         return true;
       }
@@ -179,18 +184,17 @@ export default function NewRecording({ route, navigation }) {
   }
 
   const handleTextInput = async () => {
-    console.log(textInput);
     const updatedItems = [...items];
     let coordinates = {};
 
-    if (!isEmptyOrSpaces(textInput)) {
+    if (!isEmptyOrSpaces(currentResult)) {
       coordinates = await getCoordinates();
 
-      if (!isAlreadyInList(textInput)) {
+      if (!isAlreadyInList(currentResult)) {
         setItems((prevState) => [
           ...prevState,
           {
-            name: textInput,
+            name: currentResult,
             amount: 1,
             imageUri: '',
             geolocations: [coordinates],
@@ -198,7 +202,7 @@ export default function NewRecording({ route, navigation }) {
         ]);
       } else {
         for ([index, value] of items.entries()) {
-          if (value.name.toLowerCase() === textInput.toLowerCase()) {
+          if (value.name.toLowerCase() === currentResult.toLowerCase()) {
             updatedItems[index].amount = updatedItems[index].amount + 1;
             updatedItems[index].geolocations.push(coordinates);
           }
@@ -318,9 +322,7 @@ export default function NewRecording({ route, navigation }) {
     minutes = formatTime(minutes);
     hours = formatTime(hours);
 
-    console.log(`${hours}:${minutes}:${seconds}`);
     let date = new Date();
-    //date = Date.parse(date);
 
     calcTotalAmount().then((total) => {
       const data = {
@@ -366,28 +368,8 @@ export default function NewRecording({ route, navigation }) {
   return (
     <Layout headerTitle="New Recording" navigationObject={navigation}>
       {previewModal}
-      <ScrollView
-        style={{
-          width: '100%',
-          height: '100%',
-          paddingTop: 16,
-          padding: 10,
-          marginBottom: -100,
-          borderRadius: 30,
-        }}
-        contentContainerStyle={{ paddingBottom: 0 }}
-      >
-        <Text
-          style={{
-            alignSelf: 'flex-start',
-            textAlign: 'left',
-            fontSize: 18,
-            marginBottom: 4,
-            fontFamily: 'Montserrat-Semibold',
-          }}
-        >
-          What do you want to add?
-        </Text>
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 0 }}>
+        <Text style={styles.textInputLabel}>What do you want to add?</Text>
 
         <View style={styles.textBoxContainer}>
           <TouchableOpacity onPress={() => toggleMic()}>{micIcon}</TouchableOpacity>
@@ -398,13 +380,7 @@ export default function NewRecording({ route, navigation }) {
             clearButtonMode="while-editing"
             placeholderTextColor="lightgray"
             selectionColor="black"
-            style={{
-              height: '100%',
-              flex: 1,
-              marginLeft: 4,
-              color: 'black',
-              fontSize: 16,
-            }}
+            style={styles.textInput}
             onChangeText={(text) => setTextInput(text)}
             value={textInput}
           />
@@ -420,17 +396,7 @@ export default function NewRecording({ route, navigation }) {
         </View>
 
         <View style={styles.listContainer}>
-          <Text
-            style={{
-              alignSelf: 'flex-start',
-              textAlign: 'left',
-              fontSize: 18,
-              marginBottom: 10,
-              fontFamily: 'Montserrat-Bold',
-            }}
-          >
-            Current list
-          </Text>
+          <Text style={styles.listTitle}>Current list</Text>
 
           <Dash style={{ width: '100%', height: 1 }} dashGap={2} dashLength={12} dashColor="#707070" />
 
@@ -507,5 +473,34 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     zIndex: 10,
     paddingTop: 4,
+  },
+  textInput: {
+    height: '100%',
+    flex: 1,
+    marginLeft: 4,
+    color: 'black',
+    fontSize: 16,
+  },
+  listTitle: {
+    alignSelf: 'flex-start',
+    textAlign: 'left',
+    fontSize: 18,
+    marginBottom: 10,
+    fontFamily: 'Montserrat-Bold',
+  },
+  textInputLabel: {
+    alignSelf: 'flex-start',
+    textAlign: 'left',
+    fontSize: 18,
+    marginBottom: 4,
+    fontFamily: 'Montserrat-Semibold',
+  },
+  container: {
+    width: '100%',
+    height: '100%',
+    paddingTop: 16,
+    padding: 10,
+    marginBottom: -100,
+    borderRadius: 30,
   },
 });

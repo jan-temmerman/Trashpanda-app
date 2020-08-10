@@ -15,7 +15,7 @@ export default function ListItem(props) {
     </TouchableOpacity>
   );
 
-  if (props.imageUri != '') {
+  if (props.imageUri !== '' && props.imageUri !== null) {
     imageButton = (
       <TouchableOpacity onPress={() => props.showPreview(props.index, props.imageUri)} style={styles.cameraButton2}>
         <Image style={{ width: '100%', height: '100%', borderRadius: 10 }} source={{ uri: props.imageUri }} />
