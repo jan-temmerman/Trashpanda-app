@@ -11,6 +11,7 @@ import Voice from '@react-native-community/voice';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
+import { getDistance, getPreciseDistance } from 'geolib';
 
 // Components
 import Layout from '../components/layout';
@@ -30,6 +31,9 @@ export default function NewRecording({ route, navigation }) {
   const [items, setItems] = useState([]);
   let currentResult;
   const [startTime, setStartTime] = useState();
+  const [startCoordinates, setStartCoordinates] = useState({ latitude: 0, longitude: 0 });
+  const [endCoordinates, setEndCoordinates] = useState({ latitude: 0, longitude: 0 });
+  const [distance, setDistance] = useState(0);
 
   useEffect(() => {
     console.log(imageUri);
@@ -45,6 +49,7 @@ export default function NewRecording({ route, navigation }) {
     if (micIcon) handleMircophone('start');
     else handleMircophone('start');
 
+    getCoordinates().then((coords) => setStartCoordinates(coords));
     setStartTime(new Date().getTime());
   }, []);
 
@@ -170,14 +175,18 @@ export default function NewRecording({ route, navigation }) {
     let coordinates;
 
     return new Promise((resolve) => {
-      Geolocation.getCurrentPosition((info) => {
-        coordinates = {
-          latitude: info.coords.latitude,
-          longitude: info.coords.longitude,
-        };
+      Geolocation.getCurrentPosition(
+        (info) => {
+          coordinates = {
+            latitude: info.coords.latitude,
+            longitude: info.coords.longitude,
+          };
 
-        resolve(coordinates);
-      });
+          resolve(coordinates);
+        },
+        (error) => console.log(error),
+        { enableHighAccuracy: true },
+      );
     });
   };
 
@@ -314,9 +323,17 @@ export default function NewRecording({ route, navigation }) {
   };
 
   const sendData = () => {
+    getCoordinates().then((coords) => {
+      console.log(startCoordinates, coords);
+      let pdis = getPreciseDistance(startCoordinates, coords);
+      setEndCoordinates(coords);
+      setDistance(pdis);
+      console.log(pdis);
+    });
+
     const endTime = new Date().getTime();
     const resolution = endTime - startTime;
-    let seconds = resolution / 1000; // seconds go over 60 FIX THIS
+    let seconds = resolution / 1000;
     let minutes = resolution / 1000 / 60;
     let hours = resolution / 1000 / 60 / 60;
 
@@ -342,11 +359,12 @@ export default function NewRecording({ route, navigation }) {
       const data = {
         time: `${hours}:${minutes}:${seconds}`,
         itemsAmount: total,
-        date,
-        items,
+        date: date,
+        items: items,
+        distance: distance,
       };
 
-      if (auth().currentUser)
+      /*if (auth().currentUser)
         database()
           .ref(`/recordings/users/${auth().currentUser.uid}/${date}/`)
           .set(data)
@@ -355,7 +373,10 @@ export default function NewRecording({ route, navigation }) {
         database()
           .ref(`/recordings/anonymous/${date}/`)
           .set(data)
-          .then(() => navigation.navigate('SummaryView', { data }));
+          .then(() => */ navigation.navigate(
+        'SummaryView',
+        { data },
+      );
     });
   };
 
