@@ -29,7 +29,7 @@ export default function NewRecording({ route, navigation }) {
   const [previewModal, setPreviewModal] = useState(null);
   const [items, setItems] = useState([]);
   let currentResult;
-  const [startTime, setStartTime] = useState(new Date().getTime());
+  const [startTime, setStartTime] = useState();
 
   useEffect(() => {
     console.log(imageUri);
@@ -44,6 +44,8 @@ export default function NewRecording({ route, navigation }) {
   useEffect(() => {
     if (micIcon) handleMircophone('start');
     else handleMircophone('start');
+
+    setStartTime(new Date().getTime());
   }, []);
 
   const isStartStopDetected = (spokenTextLowered) => {
@@ -293,8 +295,8 @@ export default function NewRecording({ route, navigation }) {
   };
 
   const formatTime = (number) => {
-    if (number < 10) number = `0${Math.round(number).toFixed(0)}`;
-    else number = Math.round(number).toFixed(0);
+    if (number < 10) number = `0${Math.floor(number).toFixed(0)}`;
+    else number = Math.floor(number).toFixed(0);
 
     return number;
   };
@@ -318,9 +320,21 @@ export default function NewRecording({ route, navigation }) {
     let minutes = resolution / 1000 / 60;
     let hours = resolution / 1000 / 60 / 60;
 
+    if (seconds / 60 >= 1) {
+      const timeToCut = Math.round(minutes).toFixed(0) * 60;
+      seconds = seconds - timeToCut;
+    }
+
+    if (minutes / 60 >= 1) {
+      const timeToCut = Math.round(hours).toFixed(0) * 60;
+      seconds = seconds - timeToCut;
+    }
+
     seconds = formatTime(seconds);
     minutes = formatTime(minutes);
     hours = formatTime(hours);
+
+    console.log(hours, minutes, seconds);
 
     let date = new Date();
 
