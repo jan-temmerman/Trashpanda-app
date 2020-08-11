@@ -13,10 +13,9 @@ import Card from '../components/card';
 import EmptyListPlaceholder from '../components/emptyListPlaceholder';
 
 export default function MyRecordings({ navigation }) {
-  const [itemsList, setItemsList] = useState([]);
-  const [itemsListRendered, setItemsListRendered] = useState();
-  const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [itemsObject, setItemsObject] = useState({});
+  const [itemsKeys, setItemsKeys] = useState([]);
+  const [sortedItemsKeys, setSortedItemsKeys] = useState([]);
   const [isBusy, setIsBusy] = useState(false);
 
   useEffect(() => {
@@ -28,18 +27,28 @@ export default function MyRecordings({ navigation }) {
     return;
   }, []);
 
+  useEffect(() => {
+    setSortedItemsKeys(
+      itemsKeys.sort(function (a, b) {
+        return new Date(b) - new Date(a);
+      }),
+    );
+    return;
+  }, [itemsKeys]);
+
   const checkForUser = () => {
     setIsBusy(true);
     if (auth().currentUser) {
-      setUserLoggedIn(true);
       database()
         .ref(`/recordings/users/${auth().currentUser.uid}`)
         .once('value')
         .then((snapshot) => {
           setIsBusy(false);
           //console.log('User logged in, items: ', Object.keys(snapshot.val()));
-          if (snapshot.val()) setItemsObject(snapshot.val());
-          else setItemsObject({});
+          if (snapshot.val()) {
+            setItemsObject(snapshot.val());
+            setItemsKeys(Object.keys(snapshot.val()));
+          } else setItemsObject({});
         });
     } else {
       setIsBusy(false);
@@ -62,7 +71,7 @@ export default function MyRecordings({ navigation }) {
         style={{ width: '100%', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingTop: 6 }}
         contentContainerStyle={{ paddingBottom: 300 }}
         showsVerticalScrollIndicator={false}
-        data={Object.keys(itemsObject).reverse()}
+        data={sortedItemsKeys}
         ListEmptyComponent={<EmptyListPlaceholder />}
         keyExtractor={(item, index) => {
           return item;
@@ -72,7 +81,7 @@ export default function MyRecordings({ navigation }) {
             <Card
               data={itemsObject[item]}
               navigation={navigation}
-              distance={(itemsObject[item].distance / 1000).toFixed(2)}
+              distance={(itemsObject[item]?.distance / 1000).toFixed(2)}
               time={itemsObject[item].time}
               itemsCount={itemsObject[item].itemsAmount}
               date={new Date(item).toLocaleString()}
