@@ -1,17 +1,6 @@
 import 'react-native-gesture-handler';
-import React, { useEffect, useState } from 'react';
-import {
-  YellowBox,
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import React, { useState } from 'react';
+import { YellowBox, StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Dash from 'react-native-dash';
 import Emoji from 'react-native-emoji';
@@ -26,33 +15,13 @@ export default function DetailView({ route, navigation }) {
   YellowBox.ignoreWarnings(['Non-serializable values were found in the navigation state']);
   const { data, date } = route.params;
   const [previewModal, setPreviewModal] = useState(null);
-  const [isBusy, setIsBusy] = useState(false);
 
   const showPreview = (index, imageUri) => {
     if (imageUri != '') {
       setPreviewModal(
-        <View
-          style={{
-            position: 'absolute',
-            flex: 1,
-            width: '100%',
-            height: '100%',
-            zIndex: 20,
-            borderRadius: 30,
-            overflow: 'hidden',
-            justifyContent: 'flex-end',
-          }}
-        >
+        <View style={styles.previewModal}>
           <Image style={{ width: '100%', height: '100%', backgroundColor: 'red' }} source={{ uri: imageUri }} />
-          <TouchableOpacity
-            onPress={() => setPreviewModal(null)}
-            style={{
-              zIndex: 21,
-              position: 'absolute',
-              top: 10,
-              left: 20,
-            }}
-          >
+          <TouchableOpacity onPress={() => setPreviewModal(null)} style={styles.closeButton}>
             <Octicons name="x" size={38} color="#FFF" />
           </TouchableOpacity>
         </View>,
@@ -102,8 +71,6 @@ export default function DetailView({ route, navigation }) {
       return ` ${kilometers} kilometers and ${meters} meters `;
     }
   };
-
-  const regex = /^(.+?),/g;
 
   return (
     <Layout headerTitle={'Summary'} navigationObject={navigation} backButtonVisible={true}>
@@ -300,5 +267,21 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     marginTop: -40,
     fontFamily: 'Montserrat-Regular',
+  },
+  previewModal: {
+    position: 'absolute',
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    zIndex: 20,
+    borderRadius: 30,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
+  closeButton: {
+    zIndex: 21,
+    position: 'absolute',
+    top: 10,
+    left: 20,
   },
 });

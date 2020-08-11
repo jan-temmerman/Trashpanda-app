@@ -6,6 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import NetInfo from '@react-native-community/netinfo';
 
 // Views
 import MyRecordings from './src/views/MyRecordings';
@@ -19,6 +20,7 @@ import DetailView from './src/views/DetailView';
 import SignIn from './src/views/SignIn';
 import SignUp from './src/views/SignUp';
 import SaveData from './src/views/SaveData';
+import NoConnection from './src/views/NoConnection';
 
 function OnboardStack() {
   const OnboardStack = createStackNavigator();
@@ -89,31 +91,45 @@ function HomeTabs() {
 export default function App() {
   const RecordingsStack = createStackNavigator();
 
-  return (
-    <NavigationContainer>
-      <RecordingsStack.Navigator screenOptions={{ headerShown: false }}>
-        <RecordingsStack.Screen name="HomeTabs" component={HomeTabs} />
-        <RecordingsStack.Screen name="AddRecording" component={AddRecording} />
-        <RecordingsStack.Screen name="SignUp" component={SignUp} />
-        <RecordingsStack.Screen name="SignIn" component={SignIn} />
-        <RecordingsStack.Screen name="Detail" initialParams={{ data: null }} component={DetailView} />
-        <RecordingsStack.Screen name="SaveData" initialParams={{ data: null }} component={SaveData} />
-        <RecordingsStack.Screen
-          options={{ gestureEnabled: true }}
-          name="NewRecording"
-          component={NewRecording}
-          initialParams={{ itemIndex: null, imageUri: null }}
-        />
-        <RecordingsStack.Screen
-          options={{ gestureEnabled: true }}
-          name="SummaryView"
-          component={SummaryView}
-          initialParams={{ data: null }}
-        />
-        <RecordingsStack.Screen options={{ gestureEnabled: true }} name="CameraView" component={CameraView} />
-      </RecordingsStack.Navigator>
-    </NavigationContainer>
-  );
+  const [hasConnection, setHasConnection] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      console.log('Connection type', state.type);
+      console.log('Is connected?', state.isConnected);
+      setHasConnection(state.isConnected);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (hasConnection)
+    return (
+      <NavigationContainer>
+        <RecordingsStack.Navigator screenOptions={{ headerShown: false }}>
+          <RecordingsStack.Screen name="HomeTabs" component={HomeTabs} />
+          <RecordingsStack.Screen name="AddRecording" component={AddRecording} />
+          <RecordingsStack.Screen name="SignUp" component={SignUp} />
+          <RecordingsStack.Screen name="SignIn" component={SignIn} />
+          <RecordingsStack.Screen name="Detail" initialParams={{ data: null }} component={DetailView} />
+          <RecordingsStack.Screen name="SaveData" initialParams={{ data: null }} component={SaveData} />
+          <RecordingsStack.Screen
+            options={{ gestureEnabled: true }}
+            name="NewRecording"
+            component={NewRecording}
+            initialParams={{ itemIndex: null, imageUri: null }}
+          />
+          <RecordingsStack.Screen
+            options={{ gestureEnabled: true }}
+            name="SummaryView"
+            component={SummaryView}
+            initialParams={{ data: null }}
+          />
+          <RecordingsStack.Screen options={{ gestureEnabled: true }} name="CameraView" component={CameraView} />
+        </RecordingsStack.Navigator>
+      </NavigationContainer>
+    );
+  else return <NoConnection />;
 }
 
 const styles = StyleSheet.create({

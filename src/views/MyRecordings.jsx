@@ -44,7 +44,6 @@ export default function MyRecordings({ navigation }) {
         .once('value')
         .then((snapshot) => {
           setIsBusy(false);
-          //console.log('User logged in, items: ', Object.keys(snapshot.val()));
           if (snapshot.val()) {
             setItemsObject(snapshot.val());
             setItemsKeys(Object.keys(snapshot.val()));
@@ -82,8 +81,8 @@ export default function MyRecordings({ navigation }) {
               data={itemsObject[item]}
               navigation={navigation}
               distance={(itemsObject[item]?.distance / 1000).toFixed(2)}
-              time={itemsObject[item].time}
-              itemsCount={itemsObject[item].itemsAmount}
+              time={itemsObject[item]?.time}
+              itemsCount={itemsObject[item]?.itemsAmount}
               date={new Date(item).toLocaleString()}
               city={'Lokeren'}
             />
