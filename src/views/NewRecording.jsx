@@ -62,6 +62,7 @@ export default function NewRecording({ route, navigation }) {
   }, []);
 
   const isStartStopDetected = (spokenTextLowered) => {
+    console.log(spokenTextLowered, 'HERE');
     const startIndex = spokenTextLowered.indexOf('start');
     const stopIndex = spokenTextLowered.indexOf('stop');
 
@@ -95,7 +96,7 @@ export default function NewRecording({ route, navigation }) {
       /*setTimeout(() => {
         handleTextInput();
       }, 1000);*/
-      setIsEnterDetected(true);
+
       handleMircophone('stop');
       setTimeout(() => {
         handleMircophone('start');
@@ -112,6 +113,7 @@ export default function NewRecording({ route, navigation }) {
       Voice.onSpeechStart = () => console.log('speech started');
       Voice.onSpeechEnd = () => handleEnding();
       Voice.onSpeechResults = (e) => checkResults(e.value[0]);
+      Voice.onSpeechError = (e) => console.log(e);
 
       try {
         await Voice.start('en-US');
@@ -206,7 +208,6 @@ export default function NewRecording({ route, navigation }) {
   const handleTextInput = async () => {
     const updatedItems = [...items];
     let coordinates = {};
-    console.log(typeof textInput, 'hierzoo');
     if (!isEmptyOrSpaces(textInput)) {
       coordinates = await getCoordinates();
 
