@@ -1,8 +1,9 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
-import Voice from '@react-native-community/voice';
+import database from '@react-native-firebase/database';
 import MapboxGL from '@react-native-mapbox-gl/maps';
+import uniqueId from 'lodash';
 
 // Components
 import Layout from '../components/layout';
@@ -10,6 +11,39 @@ import Layout from '../components/layout';
 MapboxGL.setAccessToken('pk.eyJ1IjoiamFudGVtbWUiLCJhIjoiY2s5ZjBhM3Y5MDZwMDNubzdvb3E2Z2ZjNCJ9.zQuSQryovj4h_w6Eg6cmyg');
 
 export default function MapView() {
+  const [anonItems, setAnonItems] = useState({});
+  const [userItems, setUserItems] = useState({});
+
+  useEffect(() => {
+    database()
+      .ref('/recordings/anonymous')
+      .once('value')
+      .then((snapshot) => {
+        //setIsBusy(false);
+        //console.log('User logged in, items: ', Object.keys(snapshot.val()));
+        if (snapshot.val()) setAnonItems(snapshot.val());
+        else setAnonItems({});
+      });
+
+    database()
+      .ref('/recordings/users')
+      .once('value')
+      .then((snapshot) => {
+        //setIsBusy(false);
+        //console.log('User logged in, items: ', Object.keys(snapshot.val()));
+        if (snapshot.val()) setUserItems(snapshot.val());
+        else setUserItems({});
+      });
+    return;
+  }, []);
+
+  let id = 0;
+  const getUniqueId = () => {
+    id++;
+    console.log(id);
+    return id.toString();
+  };
+
   return (
     <Layout headerTitle="Map">
       <MapboxGL.MapView
@@ -24,7 +58,37 @@ export default function MapView() {
           overflow: 'hidden',
         }}
       >
-        <MapboxGL.Camera zoomLevel={12} centerCoordinate={[3.72377, 51.05]} />
+        <MapboxGL.Camera zoomLevel={7} centerCoordinate={[3.72377, 51.05]} />
+        {Object.keys(anonItems).map((key, index) => {
+          for (const [index2, item] of anonItems[key].items.entries()) {
+            for (const [index3, geolocation] of item.geolocations.entries()) {
+              return (
+                <MapboxGL.PointAnnotation
+                  id={getUniqueId()}
+                  key={getUniqueId()}
+                  coordinate={[geolocation.longitude, geolocation.latitude]}
+                />
+              );
+            }
+          }
+        })}
+        {Object.keys(userItems).map((uuid, index) => {
+          //console.log(userItems[uuid]);
+          Object.keys(userItems[uuid]).map((key, index2) => {
+            //console.log(userItems[uuid][key].items);
+            for (const [index3, item] of userItems[uuid][key].items.entries()) {
+              for (const [index4, geolocation] of item.geolocations.entries()) {
+                return (
+                  <MapboxGL.PointAnnotation
+                    id={getUniqueId()}
+                    key={getUniqueId()}
+                    coordinate={[geolocation.longitude, geolocation.latitude]}
+                  />
+                );
+              }
+            }
+          });
+        })}
       </MapboxGL.MapView>
     </Layout>
   );

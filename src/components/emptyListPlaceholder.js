@@ -9,7 +9,6 @@ import Heading from './text/heading';
 import Paragraph from './text/paragraph';
 
 export default function EmptyListPlaceholder() {
-  console.log(<Image style={styles.image} source={emtpy} resizeMode={'contain'} />);
   return (
     <View style={styles.container}>
       <View style={{ width: '70%', alignItems: 'center', alignSelf: 'center' }}>

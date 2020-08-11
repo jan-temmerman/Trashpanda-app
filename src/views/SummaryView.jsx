@@ -159,7 +159,21 @@ export default function SummaryView({ route, navigation }) {
             styleURL={MapboxGL.StyleURL.Street}
             style={{ flex: 1, width: '100%' }}
           >
-            <MapboxGL.Camera zoomLevel={12} centerCoordinate={[3.72377, 51.05]} />
+            <MapboxGL.Camera
+              zoomLevel={12}
+              centerCoordinate={[data.items[0].geolocations[0].longitude, data.items[0].geolocations[0].latitude]}
+            />
+            {data.items.map((item, index) => {
+              for (geolocation of item.geolocations) {
+                console.log('this is a location: ', geolocation.latitude);
+                return (
+                  <MapboxGL.PointAnnotation
+                    id={index.toString()}
+                    coordinate={[geolocation.longitude, geolocation.latitude]}
+                  />
+                );
+              }
+            })}
           </MapboxGL.MapView>
         </View>
 
