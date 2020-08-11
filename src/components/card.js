@@ -14,7 +14,7 @@ export default function Card(props) {
     >
       <View>
         <Text style={styles.title}>{props.date},</Text>
-        <Text style={styles.title}>{props.data.city}</Text>
+        <Text style={styles.title}>{props.data?.city}</Text>
       </View>
 
       <View style={styles.widgetsContainer}>

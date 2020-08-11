@@ -52,6 +52,8 @@ export default function MyRecordings({ navigation }) {
     } else {
       setIsBusy(false);
       setItemsObject({});
+      setItemsKeys([]);
+      setSortedItemsKeys([]);
       console.log('no user logged in');
     }
   };
@@ -84,7 +86,7 @@ export default function MyRecordings({ navigation }) {
               time={itemsObject[item]?.time}
               itemsCount={itemsObject[item]?.itemsAmount}
               date={new Date(item).toLocaleString()}
-              city={'Lokeren'}
+              city={itemsObject[item]?.itemsAmount}
             />
           );
         }}

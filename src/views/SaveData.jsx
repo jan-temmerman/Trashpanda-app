@@ -90,7 +90,7 @@ export default function SaveData({ route, navigation }) {
           <Text style={styles.secundaryButtonText}>Sign up</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.bigButton} onPress={() => sendData()}>
+      <TouchableOpacity disabled={isBusy} style={styles.bigButton} onPress={() => sendData()}>
         {renderButtonContent()}
       </TouchableOpacity>
       {renderLoadingSpinner()}

@@ -67,8 +67,8 @@ export default function Profile({ navigation }) {
   const updateProfile = () => {
     setIsBusy(true);
 
-    user
-      .updateProfile({
+    auth()
+      .currentUser.updateProfile({
         displayName: username,
       })
       .then(() => {
@@ -81,8 +81,8 @@ export default function Profile({ navigation }) {
         checkErrors(error.code);
       });
 
-    user
-      .updateEmail(email)
+    auth()
+      .currentUser.updateEmail(email)
       .then((e) => {
         setIsBusy(false);
         checkErrors('');
@@ -308,7 +308,7 @@ export default function Profile({ navigation }) {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.mainButton} onPress={() => updateProfile()}>
+          <TouchableOpacity disabled={isBusy} style={styles.mainButton} onPress={() => updateProfile()}>
             {renderButtonContent()}
           </TouchableOpacity>
 

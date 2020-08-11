@@ -23,7 +23,7 @@ export default function SignIn({ navigation }) {
     auth()
       .signInWithEmailAndPassword(email, password)
       .then((e) => {
-        setIsBusy(false);
+        //setIsBusy(false);
         navigation.goBack();
       })
       .catch(function (error) {
@@ -115,7 +115,7 @@ export default function SignIn({ navigation }) {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.mainButton} onPress={() => signIn()}>
+        <TouchableOpacity disabled={isBusy} style={styles.mainButton} onPress={() => signIn()}>
           {renderButtonContent()}
         </TouchableOpacity>
       </KeyboardAwareScrollView>
