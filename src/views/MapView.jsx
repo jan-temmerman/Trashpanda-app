@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import database from '@react-native-firebase/database';
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import uniqueId from 'lodash';
 
 // Components
 import Layout from '../components/layout';
@@ -19,8 +18,6 @@ export default function MapView() {
       .ref('/recordings/anonymous')
       .once('value')
       .then((snapshot) => {
-        //setIsBusy(false);
-        //console.log('User logged in, items: ', Object.keys(snapshot.val()));
         if (snapshot.val()) setAnonItems(snapshot.val());
         else setAnonItems({});
       });
@@ -29,8 +26,6 @@ export default function MapView() {
       .ref('/recordings/users')
       .once('value')
       .then((snapshot) => {
-        //setIsBusy(false);
-        //console.log('User logged in, items: ', Object.keys(snapshot.val()));
         if (snapshot.val()) setUserItems(snapshot.val());
         else setUserItems({});
       });
@@ -40,7 +35,6 @@ export default function MapView() {
   let id = 0;
   const getUniqueId = () => {
     id++;
-    console.log(id);
     return id.toString();
   };
 
@@ -73,9 +67,7 @@ export default function MapView() {
           }
         })}
         {Object.keys(userItems).map((uuid, index) => {
-          //console.log(userItems[uuid]);
           Object.keys(userItems[uuid]).map((key, index2) => {
-            //console.log(userItems[uuid][key].items);
             for (const [index3, item] of userItems[uuid][key].items.entries()) {
               for (const [index4, geolocation] of item.geolocations.entries()) {
                 return (

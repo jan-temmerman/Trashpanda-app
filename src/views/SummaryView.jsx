@@ -95,13 +95,6 @@ export default function SummaryView({ route, navigation }) {
       setIsBusy(false);
       navigation.navigate('SaveData', { data });
     }
-    /*database()
-        .ref(`/recordings/anonymous/${data.date}/`)
-        .set(data)
-        .then(() => {
-          setIsBusy(false);
-          navigation.navigate('MyRecordings');
-        });*/
   };
 
   const confirmDiscard = () => {
@@ -164,11 +157,12 @@ export default function SummaryView({ route, navigation }) {
               centerCoordinate={[data.items[0].geolocations[0].longitude, data.items[0].geolocations[0].latitude]}
             />
             {data.items.map((item, index) => {
-              for (geolocation of item.geolocations) {
+              for (const [index2, geolocation] of item.geolocations.entries()) {
                 console.log('this is a location: ', geolocation.latitude);
                 return (
                   <MapboxGL.PointAnnotation
-                    id={index.toString()}
+                    id={index.toString() + index2.toString()}
+                    key={index.toString() + index2.toString()}
                     coordinate={[geolocation.longitude, geolocation.latitude]}
                   />
                 );
@@ -208,25 +202,7 @@ export default function SummaryView({ route, navigation }) {
           </View>
         </View>
       </ScrollView>
-      <View
-        style={{
-          position: 'absolute',
-          width: '100%',
-          padding: 14,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: 'white',
-          borderRadius: 30,
-          paddingBottom: 60,
-          bottom: 0,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 3 },
-          shadowOpacity: 0.2,
-          shadowRadius: 4.65,
-          elevation: 7,
-        }}
-      >
+      <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.secundaryButton} onPress={() => confirmDiscard()}>
           <Text style={styles.secundaryButtonText}>Discard</Text>
         </TouchableOpacity>
@@ -324,5 +300,22 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: 'Montserrat-regular',
     color: 'black',
+  },
+  buttonContainer: {
+    position: 'absolute',
+    width: '100%',
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    borderRadius: 30,
+    paddingBottom: 60,
+    bottom: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4.65,
+    elevation: 7,
   },
 });

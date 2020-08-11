@@ -70,8 +70,9 @@ export default function MyRecordings({ navigation }) {
         renderItem={({ item, index }) => {
           return (
             <Card
+              data={itemsObject[item]}
               navigation={navigation}
-              distance={3}
+              distance={(itemsObject[item].distance / 1000).toFixed(2)}
               time={itemsObject[item].time}
               itemsCount={itemsObject[item].itemsAmount}
               date={new Date(item).toLocaleString()}

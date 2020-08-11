@@ -9,21 +9,12 @@ import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 export default function Card(props) {
   return (
     <TouchableWithoutFeedback
-      onPress={() =>
-        props.navigation.navigate('Detail', {
-          data: {
-            time: props.time,
-            itemsAmount: props.itemsCount,
-            date: props.date,
-            items: props.itemsCount,
-          },
-        })
-      }
+      onPress={() => props.navigation.navigate('Detail', { data: props.data, date: props.date })}
       style={styles.card}
     >
       <View>
         <Text style={styles.title}>{props.date},</Text>
-        <Text style={styles.title}>{props.city}</Text>
+        <Text style={styles.title}>{props.data.city}</Text>
       </View>
 
       <View style={styles.widgetsContainer}>
