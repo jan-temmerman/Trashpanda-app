@@ -23,7 +23,7 @@ export default function SignUp({ navigation }) {
         .createUserWithEmailAndPassword(email, password)
         .then((e) => {
           setIsBusy(false);
-          navigation.navigate('Profile');
+          navigation.goBack();
         })
         .catch(function (error) {
           setIsBusy(false);

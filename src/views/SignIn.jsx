@@ -24,7 +24,7 @@ export default function SignIn({ navigation }) {
       .signInWithEmailAndPassword(email, password)
       .then((e) => {
         setIsBusy(false);
-        navigation.navigate('Profile');
+        navigation.goBack();
       })
       .catch(function (error) {
         setIsBusy(false);

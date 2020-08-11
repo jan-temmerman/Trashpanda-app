@@ -1,8 +1,21 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { YellowBox, StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
+import {
+  YellowBox,
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Dash from 'react-native-dash';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 import Octicons from 'react-native-vector-icons/Octicons';
 MapboxGL.setAccessToken('pk.eyJ1IjoiamFudGVtbWUiLCJhIjoiY2s5ZjBhM3Y5MDZwMDNubzdvb3E2Z2ZjNCJ9.zQuSQryovj4h_w6Eg6cmyg');
 
@@ -15,6 +28,7 @@ export default function SummaryView({ route, navigation }) {
   const { data } = route.params;
   const [city, setCity] = useState('');
   const [previewModal, setPreviewModal] = useState(null);
+  const [isBusy, setIsBusy] = useState(false);
 
   useEffect(() => {
     console.log(data);
@@ -65,6 +79,46 @@ export default function SummaryView({ route, navigation }) {
     } else setPreviewModal(null);
   };
 
+  const sendData = () => {
+    setIsBusy(true);
+    data.city = city;
+
+    if (auth().currentUser)
+      database()
+        .ref(`/recordings/users/${auth().currentUser.uid}/${data.date}/`)
+        .set(data)
+        .then(() => {
+          setIsBusy(false);
+          navigation.navigate('MyRecordings');
+        });
+    else {
+      setIsBusy(false);
+      navigation.navigate('SaveData', { data });
+    }
+    /*database()
+        .ref(`/recordings/anonymous/${data.date}/`)
+        .set(data)
+        .then(() => {
+          setIsBusy(false);
+          navigation.navigate('MyRecordings');
+        });*/
+  };
+
+  const confirmDiscard = () => {
+    Alert.alert(
+      'Discard this recording?',
+      `You are about to delete your whole recording with al the items and images added, are you sure?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        { text: 'Yes', onPress: () => navigation.navigate('MyRecordings') },
+      ],
+      { cancelable: false },
+    );
+  };
+
   let itemsList;
 
   if (data.items.length) {
@@ -84,6 +138,11 @@ export default function SummaryView({ route, navigation }) {
   } else {
     itemsList = <Text style={styles.itemsListEmptyText}>No items added yet.</Text>;
   }
+
+  const renderButtonContent = () => {
+    if (isBusy) return <ActivityIndicator size="small" color="#FFFFFF" />;
+    else return <Text style={styles.mainButtonText}>Save</Text>;
+  };
 
   return (
     <Layout headerTitle={'Summary'} navigationObject={navigation} backButtonVisible={true}>
@@ -127,7 +186,7 @@ export default function SummaryView({ route, navigation }) {
 
         <View style={{ width: '100%', paddingLeft: 10, paddingRight: 10, paddingBottom: 140 }}>
           <View style={styles.listContainer}>
-            <Text style={styles.listTitle}>Current list</Text>
+            <Text style={styles.listTitle}>Items list</Text>
 
             <Dash style={{ width: '100%', height: 1 }} dashGap={2} dashLength={12} dashColor="#707070" />
 
@@ -154,12 +213,12 @@ export default function SummaryView({ route, navigation }) {
           elevation: 7,
         }}
       >
-        <TouchableOpacity style={styles.secundaryButton} onPress={() => navigation.navigate('MyRecordings')}>
+        <TouchableOpacity style={styles.secundaryButton} onPress={() => confirmDiscard()}>
           <Text style={styles.secundaryButtonText}>Discard</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.mainButton} onPress={() => navigation.navigate('SignIn')}>
-          <Text style={styles.mainButtonText}>Save</Text>
+        <TouchableOpacity style={styles.mainButton} disabled={isBusy} onPress={() => sendData()}>
+          {renderButtonContent()}
         </TouchableOpacity>
       </View>
     </Layout>

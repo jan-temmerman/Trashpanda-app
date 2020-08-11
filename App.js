@@ -18,6 +18,7 @@ import SummaryView from './src/views/SummaryView';
 import DetailView from './src/views/DetailView';
 import SignIn from './src/views/SignIn';
 import SignUp from './src/views/SignUp';
+import SaveData from './src/views/SaveData';
 
 function OnboardStack() {
   const OnboardStack = createStackNavigator();
@@ -96,6 +97,7 @@ export default function App() {
         <RecordingsStack.Screen name="SignUp" component={SignUp} />
         <RecordingsStack.Screen name="SignIn" component={SignIn} />
         <RecordingsStack.Screen name="Detail" initialParams={{ data: null }} component={DetailView} />
+        <RecordingsStack.Screen name="SaveData" initialParams={{ data: null }} component={SaveData} />
         <RecordingsStack.Screen
           options={{ gestureEnabled: true }}
           name="NewRecording"
