@@ -24,7 +24,6 @@ export default function NewRecording({ route, navigation }) {
 
   const [textInput, setTextInput] = useState('');
   const [micOn, setMicOn] = useState(true);
-  const [isEnterDetected, setIsEnterDetected] = useState(false);
   const [micIcon, setMicIcon] = useState(
     <MaterialCommunityIcons name="microphone-off" size={30} color="black" style={{ paddingTop: 3 }} />,
   );
@@ -47,12 +46,6 @@ export default function NewRecording({ route, navigation }) {
   }, [textInput]);
 
   useEffect(() => {
-    if (isEnterDetected) handleTextInput();
-    setIsEnterDetected(false);
-    return;
-  }, [isEnterDetected]);
-
-  useEffect(() => {
     if (micIcon) handleMircophone('start');
     else handleMircophone('start');
 
@@ -71,16 +64,16 @@ export default function NewRecording({ route, navigation }) {
     return false;
   };
 
-  const isSubmitDetected = (spokenTextLowered) => {
+  /*const isSubmitDetected = (spokenTextLowered) => {
     if (spokenTextLowered.indexOf('enter') !== -1) {
-      setIsEnterDetected(true);
+      handleTextInput();
     } else return;
-  };
+  };*/
 
   const checkResults = (spokenText) => {
     const spokenTextLowered = spokenText.toLowerCase();
-    console.log(spokenTextLowered);
-    isSubmitDetected(spokenTextLowered);
+
+    //isSubmitDetected(spokenTextLowered);
 
     if (isStartStopDetected(spokenTextLowered)) {
       const unfilteresResult = spokenTextLowered;
@@ -89,17 +82,16 @@ export default function NewRecording({ route, navigation }) {
         unfilteresResult.lastIndexOf('stop') - 1,
       );
       currentResult = filteredResult;
-      console.log(currentResult, filteredResult);
 
       setTextInput(filteredResult);
       /*setTimeout(() => {
         handleTextInput();
       }, 1000);*/
-      setIsEnterDetected(true);
+
       handleMircophone('stop');
       setTimeout(() => {
         handleMircophone('start');
-      }, 10);
+      }, 1000);
     }
   };
 
@@ -206,15 +198,15 @@ export default function NewRecording({ route, navigation }) {
   const handleTextInput = async () => {
     const updatedItems = [...items];
     let coordinates = {};
-    console.log(typeof textInput, 'hierzoo');
-    if (!isEmptyOrSpaces(textInput)) {
+
+    if (!isEmptyOrSpaces(currentResult)) {
       coordinates = await getCoordinates();
 
-      if (!isAlreadyInList(textInput)) {
+      if (!isAlreadyInList(currentResult)) {
         setItems((prevState) => [
           ...prevState,
           {
-            name: textInput,
+            name: currentResult,
             amount: 1,
             imageUri: '',
             geolocations: [coordinates],
@@ -222,7 +214,7 @@ export default function NewRecording({ route, navigation }) {
         ]);
       } else {
         for ([index, value] of items.entries()) {
-          if (value.name.toLowerCase() === textInput.toLowerCase()) {
+          if (value.name.toLowerCase() === currentResult.toLowerCase()) {
             updatedItems[index].amount = updatedItems[index].amount + 1;
             updatedItems[index].geolocations.push(coordinates);
           }
