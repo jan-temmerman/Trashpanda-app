@@ -25,7 +25,6 @@ function OnboardStack() {
   return (
     <OnboardStack.Navigator screenOptions={{ headerShown: false }}>
       <OnboardStack.Screen name="MyRecordings" component={MyRecordings} />
-      <OnboardStack.Screen name="AddRecording" component={AddRecording} />
       <OnboardStack.Screen name="Detail" initialParams={{ data: null }} component={DetailView} />
     </OnboardStack.Navigator>
   );

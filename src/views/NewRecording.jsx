@@ -51,6 +51,7 @@ export default function NewRecording({ route, navigation }) {
 
     getCoordinates().then((coords) => setStartCoordinates(coords));
     setStartTime(new Date().getTime());
+    return () => Voice.destroy();
   }, []);
 
   const isStartStopDetected = (spokenTextLowered) => {
