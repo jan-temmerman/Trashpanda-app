@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -8,10 +8,8 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Dash from 'react-native-dash';
 import Geolocation from '@react-native-community/geolocation';
 import Voice from '@react-native-community/voice';
-import database from '@react-native-firebase/database';
-import auth from '@react-native-firebase/auth';
-import storage from '@react-native-firebase/storage';
-import { getDistance, getPreciseDistance } from 'geolib';
+import { getPreciseDistance } from 'geolib';
+import { checkLocationPermission, checkMicPermission, checkSpeechPermission } from '../utils/permissions';
 
 // Components
 import Layout from '../components/layout';
@@ -34,6 +32,13 @@ export default function NewRecording({ route, navigation }) {
   const [startCoordinates, setStartCoordinates] = useState({ latitude: 0, longitude: 0 });
   const [endCoordinates, setEndCoordinates] = useState({ latitude: 0, longitude: 0 });
   const [distance, setDistance] = useState(0);
+
+  useEffect(() => {
+    checkSpeechPermission();
+    checkMicPermission();
+    checkLocationPermission();
+    return;
+  }, []);
 
   useEffect(() => {
     console.log(imageUri);
@@ -84,9 +89,6 @@ export default function NewRecording({ route, navigation }) {
       currentResult = filteredResult;
 
       setTextInput(filteredResult);
-      /*setTimeout(() => {
-        handleTextInput();
-      }, 1000);*/
 
       handleMircophone('stop');
       setTimeout(() => {

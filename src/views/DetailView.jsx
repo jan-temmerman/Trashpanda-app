@@ -123,14 +123,14 @@ export default function DetailView({ route, navigation }) {
             <Text style={styles.stat}>{data.time}</Text>
           </View>
 
-          <View style={{ height: '100%', width: 1, borderLeftWidth: 1, borderColor: 'black' }} />
+          <View style={styles.divider} />
 
           <View style={styles.statContainer}>
             <Text style={styles.statsLabel}>Items</Text>
             <Text style={styles.stat}>{data.itemsAmount}</Text>
           </View>
 
-          <View style={{ height: '100%', width: 1, borderLeftWidth: 1, borderColor: 'black' }} />
+          <View style={styles.divider} />
 
           <View style={styles.statContainer}>
             <Text style={styles.statsLabel}>Distance</Text>
@@ -283,5 +283,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     left: 20,
+  },
+  divider: {
+    height: '100%',
+    width: 1,
+    borderLeftWidth: 1,
+    borderColor: 'black',
   },
 });

@@ -1,22 +1,11 @@
 import 'react-native-gesture-handler';
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  Button,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  Modal,
-  SafeAreaView,
-} from 'react-native';
-import Voice from '@react-native-community/voice';
+import { StyleSheet, View, TouchableOpacity, Image, ActivityIndicator, Modal, Alert, Linking } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import Octicons from 'react-native-vector-icons/Octicons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
+import { checkCameraPermission } from '../utils/permissions';
 
 // Components
 import Layout from '../components/layout';
@@ -35,6 +24,11 @@ export default function CameraView({ route, navigation }) {
     if (isBusy) return <ActivityIndicator size="small" color="#FFFFFF" />;
     else return <Octicons name="check" size={38} color="#FFF" />;
   };
+
+  useEffect(() => {
+    checkCameraPermission();
+    return;
+  }, []);
 
   useEffect(() => {
     if (imagePath !== '') setModalIsVisible(true);
