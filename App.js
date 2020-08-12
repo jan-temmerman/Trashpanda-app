@@ -94,6 +94,7 @@ export default function App() {
   const [hasConnection, setHasConnection] = useState(true);
 
   useEffect(() => {
+    console.disableYellowBox = true;
     const unsubscribe = NetInfo.addEventListener((state) => {
       console.log('Connection type', state.type);
       console.log('Is connected?', state.isConnected);

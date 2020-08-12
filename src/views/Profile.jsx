@@ -29,7 +29,6 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function Profile({ navigation }) {
   const [isBusy, setIsBusy] = useState(false);
-  const [user, setUser] = useState(auth().currentUser);
   const [profileImage, setProfileImage] = useState(null);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -41,6 +40,7 @@ export default function Profile({ navigation }) {
   const photoWidth = windowWidth * 0.25;
 
   useEffect(() => {
+    const user = auth().currentUser;
     checkErrors('');
     if (auth().currentUser) {
       setProfileImage(auth().currentUser.photoURL);
@@ -187,6 +187,7 @@ export default function Profile({ navigation }) {
   };
 
   const deleteCurrentImage = () => {
+    const user = auth().currentUser;
     if (user.photoURL !== null && user.photoURL !== '')
       storage()
         .ref(getRefFromUrl(user.photoURL))
@@ -195,6 +196,8 @@ export default function Profile({ navigation }) {
   };
 
   const uploadImage = (photo) => {
+    const user = auth().currentUser;
+
     storage()
       .ref(`users/${user.uid}/${photo.filename}`)
       .putFile(photo.path)
@@ -218,6 +221,7 @@ export default function Profile({ navigation }) {
   };
 
   const deleteProfileImage = () => {
+    const user = auth().currentUser;
     deleteCurrentImage();
     user
       .updateProfile({

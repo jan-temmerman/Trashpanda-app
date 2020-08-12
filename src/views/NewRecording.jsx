@@ -286,7 +286,7 @@ export default function NewRecording({ route, navigation }) {
             justifyContent: 'flex-end',
           }}
         >
-          <Image style={{ width: '100%', height: '100%', backgroundColor: 'red' }} source={{ uri: imageUri }} />
+          <Image style={{ width: '100%', height: '100%' }} source={{ uri: imageUri }} />
           <TouchableOpacity
             onPress={() => setPreviewModal(null)}
             style={{

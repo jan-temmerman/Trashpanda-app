@@ -20,7 +20,7 @@ export default function DetailView({ route, navigation }) {
     if (imageUri != '') {
       setPreviewModal(
         <View style={styles.previewModal}>
-          <Image style={{ width: '100%', height: '100%', backgroundColor: 'red' }} source={{ uri: imageUri }} />
+          <Image style={{ width: '100%', height: '100%' }} source={{ uri: imageUri }} />
           <TouchableOpacity onPress={() => setPreviewModal(null)} style={styles.closeButton}>
             <Octicons name="x" size={38} color="#FFF" />
           </TouchableOpacity>

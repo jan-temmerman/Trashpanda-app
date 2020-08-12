@@ -48,23 +48,40 @@ export default function CameraView({ route, navigation }) {
     const name = new Date();
     const user = auth().currentUser;
 
-    storage()
-      .ref(`users/${user.uid}/recordings/images/${name}`)
-      .putFile(imagePath)
-      .then(() => {
-        storage()
-          .ref(`users/${user.uid}/recordings/images/${name}`)
-          .getDownloadURL()
-          .then((imageUri) => {
-            console.log(imageUri);
-            setIsBusy(false);
-            navigation.navigate('NewRecording', { itemIndex, imageUri });
-          });
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsBusy(false);
-      });
+    if (user)
+      storage()
+        .ref(`users/${user.uid}/recordings/images/${name}`)
+        .putFile(imagePath)
+        .then(() => {
+          storage()
+            .ref(`users/${user.uid}/recordings/images/${name}`)
+            .getDownloadURL()
+            .then((imageUri) => {
+              setIsBusy(false);
+              navigation.navigate('NewRecording', { itemIndex, imageUri });
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+          setIsBusy(false);
+        });
+    else
+      storage()
+        .ref(`anonymous/recordings/images/${name}`)
+        .putFile(imagePath)
+        .then(() => {
+          storage()
+            .ref(`anonymous/recordings/images/${name}`)
+            .getDownloadURL()
+            .then((imageUri) => {
+              setIsBusy(false);
+              navigation.navigate('NewRecording', { itemIndex, imageUri });
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+          setIsBusy(false);
+        });
   };
 
   return (
