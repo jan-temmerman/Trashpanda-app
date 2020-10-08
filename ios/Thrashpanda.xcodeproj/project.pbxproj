@@ -25,8 +25,27 @@
 		D909016424E43F5B001EFF07 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D909016324E43F5B001EFF07 /* Launch Screen.storyboard */; };
 		D9A0BFA624560035009C2958 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D9A0BFA524560035009C2958 /* GoogleService-Info.plist */; };
 		D9D5219824B0A45100CFD2D6 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = D9D5219724B0A45100CFD2D6 /* assets */; };
+		D9FBE9B7252FD934003FD80C /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FBE9B6252FD934003FD80C /* Mapbox.framework */; };
+		D9FBE9BB252FD942003FD80C /* MapboxMobileEvents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FBE9BA252FD942003FD80C /* MapboxMobileEvents.framework */; };
+		D9FBEA21252FDA61003FD80C /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D9FBE9B6252FD934003FD80C /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D9FBEA22252FDA6D003FD80C /* MapboxMobileEvents.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D9FBE9BA252FD942003FD80C /* MapboxMobileEvents.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E4F85594C4FE4D0BA7B31E2D /* Montserrat-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 02E6C085AEB54893B7A8BF55 /* Montserrat-SemiBold.otf */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D9FBE9B9252FD934003FD80C /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D9FBEA22252FDA6D003FD80C /* MapboxMobileEvents.framework in Embed Frameworks */,
+				D9FBEA21252FDA61003FD80C /* Mapbox.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
@@ -68,6 +87,8 @@
 		D914C3AA24AE89E2004075ED /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../assets; sourceTree = "<group>"; };
 		D9A0BFA524560035009C2958 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D9D5219724B0A45100CFD2D6 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../src/assets; sourceTree = "<group>"; };
+		D9FBE9B6252FD934003FD80C /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Mapbox.framework; path = "../../../../../../../Downloads/mapbox-ios-sdk-dynamic-with-events/dynamic/Mapbox.framework"; sourceTree = "<group>"; };
+		D9FBE9BA252FD942003FD80C /* MapboxMobileEvents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapboxMobileEvents.framework; path = "../../../../../../../Downloads/mapbox-ios-sdk-dynamic-with-events/dynamic/MapboxMobileEvents.framework"; sourceTree = "<group>"; };
 		E6FC86D8E81B4353B9F22D87 /* Montserrat-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Bold.ttf"; path = "../assets/fonts/Montserrat-Bold.ttf"; sourceTree = "<group>"; };
 		E8A9853CBD4579D399EB3F34 /* Pods-Thrashpanda.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Thrashpanda.debug.xcconfig"; path = "Target Support Files/Pods-Thrashpanda/Pods-Thrashpanda.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -81,7 +102,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D9FBE9BB252FD942003FD80C /* MapboxMobileEvents.framework in Frameworks */,
 				53511779490AA81389E02467 /* libPods-Thrashpanda.a in Frameworks */,
+				D9FBE9B7252FD934003FD80C /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,6 +132,8 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D9FBE9BA252FD942003FD80C /* MapboxMobileEvents.framework */,
+				D9FBE9B6252FD934003FD80C /* Mapbox.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
@@ -206,6 +231,7 @@
 				95C2B325E4847061336B8DE3 /* [CP] Embed Pods Frameworks */,
 				DFB0AB9AB9C260DE2F980585 /* [CP] Copy Pods Resources */,
 				42B8D1961FD4F4AC2B72E2E8 /* [CP-User] [RNFB] Core Configuration */,
+				D9FBE9B9252FD934003FD80C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

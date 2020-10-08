@@ -66,17 +66,29 @@ export default function CameraView({ route, navigation }) {
           setIsBusy(false);
         });
     else
-      storage()
-        .ref(`anonymous/recordings/images/${name}`)
-        .putFile(imagePath)
+      auth().signInAnonymously()
         .then(() => {
           storage()
-            .ref(`anonymous/recordings/images/${name}`)
-            .getDownloadURL()
-            .then((imageUri) => {
-              setIsBusy(false);
-              navigation.navigate('NewRecording', { itemIndex, imageUri });
-            });
+          .ref(`anonymous/recordings/images/${name}`)
+          .putFile(imagePath)
+          .then(() => {
+            storage()
+              .ref(`anonymous/recordings/images/${name}`)
+              .getDownloadURL()
+              .then((imageUri) => {
+                setIsBusy(false);
+                auth()
+                  .signOut()
+                  .then(() => navigation.navigate('NewRecording', { itemIndex, imageUri }))
+                  .catch((error) => {
+                    console.log(error);
+                  });
+              });
+          })
+          .catch((error) => {
+            console.log(error);
+            setIsBusy(false);
+          });
         })
         .catch((error) => {
           console.log(error);

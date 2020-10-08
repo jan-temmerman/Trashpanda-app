@@ -29,6 +29,7 @@ export default function SummaryView({ route, navigation }) {
   const [city, setCity] = useState('');
   const [previewModal, setPreviewModal] = useState(null);
   const [isBusy, setIsBusy] = useState(false);
+  const [totalPoints, setTotalPoints] = useState([]);
 
   useEffect(() => {
     console.log(data);
@@ -37,8 +38,19 @@ export default function SummaryView({ route, navigation }) {
     )
       .then((response) => response.json())
       .then((geodata) => setCity(geodata.city));
+
+    data.items.forEach((item, index) => {
+      item.geolocations.forEach((geolocation, index2) => {
+        setTotalPoints(prevState => [...prevState, geolocation]);
+      });
+    });
+  
     return;
   }, []);
+
+  useEffect(() => {
+    console.log(('LOCATIONS', totalPoints))
+  }, [totalPoints])
 
   const formatDate = (number) => {
     if (number < 10) number = `0${Math.floor(number).toFixed(0)}`;
@@ -156,17 +168,14 @@ export default function SummaryView({ route, navigation }) {
               zoomLevel={12}
               centerCoordinate={[data.items[0].geolocations[0].longitude, data.items[0].geolocations[0].latitude]}
             />
-            {data.items.map((item, index) => {
-              for (const [index2, geolocation] of item.geolocations.entries()) {
-                console.log('this is a location: ', geolocation.latitude);
-                return (
-                  <MapboxGL.PointAnnotation
-                    id={index.toString() + index2.toString()}
-                    key={index.toString() + index2.toString()}
-                    coordinate={[geolocation.longitude, geolocation.latitude]}
-                  />
-                );
-              }
+            {totalPoints.map((point, index) => {
+              return (
+                <MapboxGL.PointAnnotation
+                  id={index.toString()}
+                  key={index.toString()}
+                  coordinate={[point.longitude, point.latitude]}
+                />
+              );
             })}
           </MapboxGL.MapView>
         </View>

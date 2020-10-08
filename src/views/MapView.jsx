@@ -10,24 +10,39 @@ import Layout from '../components/layout';
 MapboxGL.setAccessToken('pk.eyJ1IjoiamFudGVtbWUiLCJhIjoiY2s5ZjBhM3Y5MDZwMDNubzdvb3E2Z2ZjNCJ9.zQuSQryovj4h_w6Eg6cmyg');
 
 export default function MapView() {
-  const [anonItems, setAnonItems] = useState({});
-  const [userItems, setUserItems] = useState({});
+  const [points, setPoints] = useState([]);
 
   useEffect(() => {
     database()
       .ref('/recordings/anonymous')
       .once('value')
       .then((snapshot) => {
-        if (snapshot.val()) setAnonItems(snapshot.val());
-        else setAnonItems({});
+        if (snapshot.val()) {
+          Object.keys(snapshot.val()).forEach((key, index) => {
+            for (const [index2, item] of snapshot.val()[key].items.entries()) {
+              item.geolocations.forEach((geolocation) => {
+                setPoints(prevState => [...prevState, geolocation]);
+              })
+            }
+          })
+        }
       });
 
     database()
       .ref('/recordings/users')
       .once('value')
       .then((snapshot) => {
-        if (snapshot.val()) setUserItems(snapshot.val());
-        else setUserItems({});
+        if (snapshot.val()) {
+          Object.keys(snapshot.val()).map((uuid, index) => {
+            Object.keys(snapshot.val()[uuid]).map((key, index2) => {
+              for (const [index3, item] of snapshot.val()[uuid][key].items.entries()) {
+                item.geolocations.forEach((geolocation) => {
+                  setPoints(prevState => [...prevState, geolocation]);
+                })
+              }
+            });
+          })
+        }
       });
     return;
   }, []);
@@ -53,33 +68,14 @@ export default function MapView() {
         }}
       >
         <MapboxGL.Camera zoomLevel={7} centerCoordinate={[3.72377, 51.05]} />
-        {Object.keys(anonItems).map((key, index) => {
-          for (const [index2, item] of anonItems[key].items.entries()) {
-            for (const [index3, geolocation] of item.geolocations.entries()) {
-              return (
-                <MapboxGL.PointAnnotation
-                  id={getUniqueId()}
-                  key={getUniqueId()}
-                  coordinate={[geolocation.longitude, geolocation.latitude]}
-                />
-              );
-            }
-          }
-        })}
-        {Object.keys(userItems).map((uuid, index) => {
-          Object.keys(userItems[uuid]).map((key, index2) => {
-            for (const [index3, item] of userItems[uuid][key].items.entries()) {
-              for (const [index4, geolocation] of item.geolocations.entries()) {
-                return (
-                  <MapboxGL.PointAnnotation
-                    id={getUniqueId()}
-                    key={getUniqueId()}
-                    coordinate={[geolocation.longitude, geolocation.latitude]}
-                  />
-                );
-              }
-            }
-          });
+        {points.map((point, index) => {
+          return (
+            <MapboxGL.PointAnnotation
+              id={index.toString()}
+              key={index.toString()}
+              coordinate={[point.longitude, point.latitude]}
+            />
+          );
         })}
       </MapboxGL.MapView>
     </Layout>
